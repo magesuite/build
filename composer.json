@@ -2,10 +2,20 @@
     "name": "creativestyle/creativeshop-build",
     "description": "Build automation for creativeshop",
     "minimum-stability": "dev",
-    "require": {},
+    "require": {
+        "slowprog/composer-copy-file": "~0.2"
+    },
     "scripts": {
-        "post-install-cmd": ["@install-files"],
-        "post-update-cmd": ["@install-files"],
-        "install-files": "cp -r vendor/creativestyle/creativeshop-build build"
+        "post-install-cmd": [
+            "SlowProg\\CopyFile\\ScriptHandler::copy"
+        ],
+        "post-update-cmd": [
+            "SlowProg\\CopyFile\\ScriptHandler::copy"
+        ]
+    },
+    "extra": {
+        "copy-file": {
+            "vendor/creativestyle/creativeshop-build/": "build/"
+        }
     }
 }
