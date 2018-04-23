@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="creativeshop-tests" default="tests">
+
+    <target name="check:phpunit" hidden="true">
+        <available file="${phpunit.location}" property="phpunit.available"/>
+        <if>
+            <not>
+                <isset property="phpunit.available"/>
+            </not>
+            <then>
+                <fail message="PHPUnit in location ${phpunit.location} is not available. Install it with composer install."/>
+            </then>
+        </if>
+    </target>
+
+    <target name="tests:unit:check" depends="check:phpunit"/>
+    <target name="tests:integration:check" depends="check:phpunit"/>
+
+    <target name="tests:functional:check">
+        <phingcall target="check:phpunit">
+            <property name="phpunit.location" value="${phpunit.functional.location}"/>
+        </phingcall>
+    </target>
+
+    <target name="tests" depends="tests:unit, tests:integration"/>
+
+    <target name="tests:unit" depends="tests:unit:check, tests:integration:prepare">
+        <phingcall target="tests:run">
+            <property name="phpunit.location" value="${phpunit.location}"/>
+            <property name="phpunit.xml" value="${phpunit.xml.unit}"/>
+        </phingcall>
+    </target>
+
+    <target name="tests:integration:prepare" hidden="true">
+        <copy file="${build_dir}/${env}/dev/tests/integration/phpunit.xml"
+              tofile="${project_dir}/dev/tests/integration/phpunit.xml"
+              overwrite="true"/>
+        <copy file="${build_dir}/${env}/dev/tests/integration/etc/install-config-mysql.php"
+              tofile="${project_dir}/dev/tests/integration/etc/install-config-mysql.php"
+              overwrite="true"/>
+        <copy file="${build_dir}/shared/dev/tests/integration/etc/config-global.php"
+              tofile="${project_dir}/dev/tests/integration/etc/config-global.php"
+              overwrite="true"/>
+    </target>
+
+    <target name="tests:integration" depends="tests:integration:prepare, tests:integration:check">
+        <phingcall target="tests:run">
+            <property name="phpunit.location" value="${phpunit.location}"/>
+            <property name="phpunit.xml" value="${phpunit.xml.integration}"/>
+        </phingcall>
+    </target>
+
+
+    <target name="tests:functional:prepare" hidden="true">
+        <copy file="${build_dir}/shared/dev/tests/functional/phpunit.xml"
+              tofile="${project_dir}/dev/tests/functional/phpunit.xml"
+              overwrite="true"/>
+        <copy file="${build_dir}/shared/dev/tests/functional/etc/config.xml"
+              tofile="${project_dir}/dev/tests/functional/etc/config.xml"
+              overwrite="true"/>
+    </target>
+
+    <target name="tests:functional:composer" hidden="true">
+        <exec command="php ${build_dir}/shared/dev/tests/functional/add_namespace.php ${project_dir}/dev/tests/functional/composer.json"
+              passthru="true"/>
+        <exec command="composer du" dir="${tests.functional.location}" passthru="true"/>
+        <exec command="php ${build_dir}/shared/dev/tests/functional/symlink_tests.php" passthru="true"/>
+    </target>
+
+    <target name="tests:functional:generate" hidden="true"
+            depends="tests:functional:check, tests:functional:prepare, tests:functional:composer">
+        <exec command="php utils/generate.php" dir="${tests.functional.location}" passthru="true"/>
+    </target>
+
+    <target name="tests:functional" depends="tests:functional:generate">
+        <phingcall target="tests:run">
+            <property name="phpunit.location" value="${phpunit.functional.location}"/>
+            <property name="phpunit.xml" value="${phpunit.xml.functional}"/>
+        </phingcall>
+    </target>
+
+    <target name="tests:run" hidden="true">
+        <echo message="Executing tests with environment '${env}'"/>
+        <if>
+            <isset property="folder"/>
+            <then>
+                <exec command="${phpunit.location} -c ${phpunit.xml} ${project_dir}/${folder}"
+                      passthru="true"
+                      checkreturn="true" level="error"/>
+            </then>
+            <elseif>
+                <isset property="testsuite"/>
+                <then>
+                    <exec command="${phpunit.location} -c ${phpunit.xml} --testsuite=${testsuite}"
+                          passthru="true" checkreturn="true" level="error"/>
+                </then>
+            </elseif>
+            <elseif>
+                <isset property="filter"/>
+                <then>
+                    <exec command="${phpunit.location} -c $${phpunit.xml} --filter=${filter}"
+                          passthru="true" checkreturn="true" level="error"/>
+                </then>
+            </elseif>
+            <else>
+                <exec command="${phpunit.location} -c ${phpunit.xml}"
+                      passthru="true" checkreturn="true" level="error"/>
+            </else>
+        </if>
+    </target>
+</project>

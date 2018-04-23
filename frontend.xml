@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="creativeshop-frontend" default="tests" basedir=".">
+
+    <property name="theme-name" value="creativeshop"/>
+
+    <target name="frontend:build">
+        <fail message="Please define ordered theme list using the `themes` property!">
+            <condition>
+                <not>
+                    <isset property="themes"/>
+                </not>
+            </condition>
+        </fail>
+        <foreach list="${themes}" param="theme-name" target="frontend:build-theme"/>
+    </target>
+
+    <target name="frontend:build-theme" hidden="true">
+        <echo message="Building theme ${theme-name}..."/>
+        <exec dir="${project_dir}/vendor/creativestyle/theme-${theme-name}" command="yarn --frozen-lockfile" escape="false" passthru="true" checkreturn="true"/>
+        <exec dir="${project_dir}/vendor/creativestyle/theme-${theme-name}" command="yarn build" escape="false" passthru="true" checkreturn="true"/>
+    </target>
+
+</project>

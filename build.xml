@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- This file should not be used directly and always be included from your project's build.xml -->
+
+<project name="creativeshop-base" default="help" description="creativeshop base build definition">
+
+    <!-- Warning! The dot will resolve to the directory from which this file was included (phing was run) -->
+    <resolvepath propertyName="project_dir" file="."/>
+
+    <property name="testsuite" value="creativestyle"/>
+    <property name="build_dir" value="${project_dir}/build"/>
+    <property file="${build_dir}/build.properties"/>
+
+    <import file="${build_dir}/tests.xml"/>
+    <import file="${build_dir}/backend.xml"/>
+    <import file="${build_dir}/frontend.xml"/>
+    <import file="${build_dir}/docker.xml"/>
+
+    <if>
+        <not>
+            <isset property="env"/>
+        </not>
+        <then>
+            <property name="env" value="dev"/>
+            <warn message="Property `env` not set, using default value 'dev'."/>
+        </then>
+    </if>
+
+    <target name="build">
+        <if>
+            <equals arg1="${env}" arg2="ci"/>
+            <then>
+                <phingcall target="docker:tests"/>
+            </then>
+            <else>
+                <phingcall target="tests"/>
+            </else>
+        </if>
+    </target>
+
+    <target name="help" hidden="true">
+        <echo msg="Run: phing -list"/>
+        <echo msg="to get all available tasks"/>
+        <echo msg=""/>
+        <echo msg="If you want to run subset of tests:"/>
+        <echo msg="phing tests:unit -Dfolder=vendor/creativestyle"/>
+        <echo msg="phing tests:unit -Dtestsuite=creativestyle"/>
+        <echo msg="phing tests:unit -Dfilter=CustomerTest"/>
+    </target>
+
+</project>

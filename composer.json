@@ -1,0 +1,9 @@
+{
+    "name": "creativestyle/creativeshop-build",
+    "description": "Build automation for creativeshop",
+    "minimum-stability": "dev",
+    "require": {},
+    "scripts": {
+        "install": "cp -r vendor/creativestyle/creativeshop-build build"
+    }
+}

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="creativeshop-backend" default="tests" basedir=".">
+
+    <target name="backend:decrypt-auth">
+        <exec command="ansible-vault --vault-password-file=${raccoon_vault_password_path} --output=auth.json decrypt auth.json.encrypted"/>
+    </target>
+
+    <target name="backend:build" depends="backend:decrypt-auth">
+        <!-- Double update so the patches are applies -->
+        <composer composer="${composer_bin}" command="update"/>
+        <composer composer="${composer_bin}" command="update"/>
+    </target>
+
+</project>
