@@ -4,6 +4,8 @@
     "minimum-stability": "dev",
     "require": {},
     "scripts": {
+        "post-install-cmd": ["@install"],
+        "post-update-cmd": ["@install"],
         "install": "cp -r vendor/creativestyle/creativeshop-build build"
     }
 }
