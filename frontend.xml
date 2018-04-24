@@ -16,8 +16,18 @@
 
     <target name="frontend:build-theme" hidden="true">
         <echo message="Building theme ${theme-name}..."/>
-        <exec dir="${project_dir}/vendor/creativestyle/theme-${theme-name}" command="yarn --frozen-lockfile" escape="false" passthru="true" checkreturn="true"/>
-        <exec dir="${project_dir}/vendor/creativestyle/theme-${theme-name}" command="yarn build" escape="false" passthru="true" checkreturn="true"/>
+        
+        <exec dir="${project_dir}/vendor/creativestyle/theme-${theme-name}" 
+            command="yarn --frozen-lockfile" 
+            escape="false" 
+            passthru="true" 
+            checkreturn="true"/>
+
+        <exec dir="${project_dir}/vendor/creativestyle/theme-${theme-name}" 
+            command="yarn build" 
+            escape="false" 
+            passthru="true" 
+            checkreturn="true"/>
     </target>
 
 </project>

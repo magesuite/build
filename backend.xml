@@ -6,7 +6,7 @@
     </target>
 
     <target name="backend:build" depends="backend:decrypt-auth">
-        <!-- Double update so the patches are applies -->
+        <!-- Double update so the patches are applied -->
         <composer composer="${composer_bin}" command="update"/>
         <composer composer="${composer_bin}" command="update"/>
     </target>

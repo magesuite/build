@@ -9,11 +9,23 @@
     </target>
 
     <target name="docker:start" depends="docker:cleanup" hidden="true">
-        <exec command="${docker_bin} run -d --name ${project} -v `pwd`:/var/www/html ${testing_docker_image}:${testing_docker_tag}" checkreturn="true" dir="${project_dir}" passthru="false" level="error"/>
+        <exec command="${docker_bin} run -d --name ${project} -v `pwd`:/var/www/html ${testing_docker_image}:${testing_docker_tag}" 
+            checkreturn="true" 
+            dir="${project_dir}" 
+            passthru="false" 
+            level="error"/>
+
         <echo message="Waiting for elasticsearch to come up..."/>
-        <exec command="${docker_bin} exec -t ${project} sh -c 'until curl localhost:9200 -s -o /dev/null; do sleep 0.5s ; done'" checkreturn="true" dir="${project_dir}" passthru="false"/>
+        <exec command="${docker_bin} exec -t ${project} sh -c 'until curl localhost:9200 -s -o /dev/null; do sleep 0.5s ; done'" 
+            checkreturn="true" 
+            dir="${project_dir}" 
+            passthru="false"/>
+
         <echo message="Waiting for mysql to come up..."/>
-        <exec command="${docker_bin} exec -t ${project} sh -c 'until mysql -u root -e&quot;select 1;&quot;; do sleep 0.5s ; done'" checkreturn="true" dir="${project_dir}" passthru="false"/>
+        <exec command="${docker_bin} exec -t ${project} sh -c 'until mysql -u root -e&quot;select 1;&quot;; do sleep 0.5s ; done'" 
+            checkreturn="true" 
+            dir="${project_dir}" 
+            passthru="false"/>
 
     </target>
 
@@ -21,10 +33,29 @@
         <trycatch>
             <try>
                 <phingcall target="docker:start"/>
-                <exec command="${docker_bin} exec -t ${project} sh -c 'rm -rf /var/www/generated/* /var/www/var/cache/*'" checkreturn="true" dir="${project_dir}" passthru="true" level="error"/>
-                <exec command="${docker_bin} exec -t ${project} sh -c 'rm -rf /var/www/html/dev/tests/integration/tmp/*'" checkreturn="true" dir="${project_dir}" passthru="true" level="error"/>
-                <exec command="${docker_bin} exec -t ${project} sh -c '(cd /var/www/html &amp;&amp; phing tests:unit        -Denv=${env} -Dtestsuite=${testsuite})'" checkreturn="true" dir="${project_dir}" passthru="true" level="error"/>
-                <exec command="${docker_bin} exec -t ${project} sh -c '(cd /var/www/html &amp;&amp; phing tests:integration -Denv=${env} -Dtestsuite=${testsuite})'" checkreturn="true" dir="${project_dir}" passthru="true" level="error"/>
+
+                <exec command="${docker_bin} exec -t ${project} sh -c 'rm -rf /var/www/generated/* /var/www/var/cache/*'" 
+                    checkreturn="true" dir="${project_dir}" 
+                    passthru="true" 
+                    level="error"/>
+
+                <exec command="${docker_bin} exec -t ${project} sh -c 'rm -rf /var/www/html/dev/tests/integration/tmp/*'" 
+                    checkreturn="true" 
+                    dir="${project_dir}" 
+                    passthru="true" 
+                    level="error"/>
+
+                <exec command="${docker_bin} exec -u $(id -u):$(id -g) -t ${project} sh -c '(cd /var/www/html &amp;&amp; phing tests:unit -Denv=${env} -Dtestsuite=${testsuite})'" 
+                    checkreturn="true" 
+                    dir="${project_dir}" 
+                    passthru="true" 
+                    level="error"/>
+
+                <exec command="${docker_bin} exec -u $(id -u):$(id -g) -t ${project} sh -c '(cd /var/www/html &amp;&amp; phing tests:integration -Denv=${env} -Dtestsuite=${testsuite})'" 
+                    checkreturn="true" 
+                    dir="${project_dir}" 
+                    passthru="true" 
+                    level="error"/>
             </try>
 
             <finally>
