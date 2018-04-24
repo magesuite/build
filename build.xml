@@ -27,6 +27,8 @@
     </if>
 
     <target name="build">
+        <phingcall target="backend:build"/>
+        <phingcall target="frontend:build"/>
         <if>
             <equals arg1="${env}" arg2="ci"/>
             <then>
