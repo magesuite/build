@@ -12,7 +12,7 @@
         <exec command="${docker_bin} run -d --name ${project} -v `pwd`:/var/www/html ${testing_docker_image}:${testing_docker_tag}" 
             checkreturn="true" 
             dir="${project_dir}" 
-            passthru="false" 
+            passthru="true"
             level="error"/>
 
         <echo message="Waiting for elasticsearch to come up..."/>
