@@ -2,20 +2,14 @@
     "name": "creativestyle/creativeshop-build",
     "description": "Build automation for creativeshop",
     "minimum-stability": "dev",
-    "require": {
-        "slowprog/composer-copy-file": "~0.2"
-    },
-    "scripts": {
-        "post-install-cmd": [
-            "SlowProg\\CopyFile\\ScriptHandler::copy"
-        ],
-        "post-update-cmd": [
-            "SlowProg\\CopyFile\\ScriptHandler::copy"
-        ]
-    },
+    "type": "magento2-component",
+    "require": {},
     "extra": {
-        "copy-file": {
-            "vendor/creativestyle/creativeshop-build/": "build/"
-        }
+        "map": [
+            [
+                "*",
+                "build"
+            ]
+        ]
     }
 }
