@@ -7,6 +7,30 @@
               level="error"/>
 	</target>
 
+    <target name="backend:hacks:install">
+        <if>
+            <available property="hacks" file="${project_dir}/vendor/creativestyle/performance/Hacks" type="dir" />
+            <then>
+                <echo>Copying performance hacks...</echo>
+                <copy todir="${project_dir}" overwrite="true" haltonerror="true" verbose="true">
+                    <fileset dir="vendor/creativestyle/performance/Hacks">
+                        <include name="**/*" />
+                    </fileset>
+                </copy>
+            </then>
+        </if>
+        <if>
+            <available property="hacks" file="${project_dir}/hacks" type="dir" />
+            <then>
+                <echo>Copyying project hacks...</echo>
+                <copy todir="${project_dir}" overwrite="true" haltonerror="true" verbose="true">
+                    <fileset dir="hacks/">
+                        <include name="**/*" />
+                    </fileset>
+                </copy>
+            </then>
+        </if>
+    </target>
 
     <target name="backend:decrypt-auth">
         <exec command="ansible-vault --vault-password-file=${raccoon_vault_password_path} --output=auth.json decrypt auth.json.encrypted"
@@ -18,6 +42,7 @@
         <!-- Double update so the patches are applied -->
         <composer composer="${composer_bin}" command="update"/>
         <composer composer="${composer_bin}" command="update"/>
+        <phingcall target="backend:hacks:install"/>
     </target>
 
 </project>
