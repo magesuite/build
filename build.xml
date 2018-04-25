@@ -26,9 +26,7 @@
         </then>
     </if>
 
-    <target name="build">
-        <phingcall target="backend:build"/>
-        <phingcall target="frontend:build"/>
+    <target name="tests:all">
         <if>
             <equals arg1="${env}" arg2="ci"/>
             <then>
@@ -38,6 +36,13 @@
                 <phingcall target="tests"/>
             </else>
         </if>
+    </target>
+
+    <target name="build">
+        <phingcall target="backend:build"/>
+        <phingcall target="frontend:build"/>
+        <phingcall target="tests:all"/>
+
     </target>
 
     <target name="help" hidden="true">
