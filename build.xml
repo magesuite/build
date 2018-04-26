@@ -42,7 +42,6 @@
         <phingcall target="backend:build"/>
         <phingcall target="frontend:build"/>
         <phingcall target="tests:all"/>
-
     </target>
 
     <target name="help" hidden="true">

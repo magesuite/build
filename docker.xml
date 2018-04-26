@@ -3,12 +3,12 @@
 
     <property name="theme-name" value="creativeshop"/>
 
-
     <target name="docker:cleanup" hidden="true">
         <exec command="${docker_bin} rm -f ${project}" checkreturn="false"/>
     </target>
 
     <target name="docker:start" depends="docker:cleanup" hidden="true">
+        <echo message="Using docker image '${testing_docker_image}:${testing_docker_tag}'"/>
         <exec command="${docker_bin} run -d --name ${project} -v `pwd`:/var/www/html ${testing_docker_image}:${testing_docker_tag}" 
             checkreturn="true" 
             dir="${project_dir}" 
