@@ -45,13 +45,13 @@
                     passthru="true" 
                     level="error"/>
 
-                <exec command="${docker_bin} exec -u $(id -u):$(id -g) -t ${project} sh -c '(cd /var/www/html &amp;&amp; phing tests:unit -Denv=${env} -Dtestsuite=${testsuite})'" 
+                <exec command="${docker_bin} exec -u $(id -u):$(id -g) -t ${project} sh -c '(cd /var/www/html &amp;&amp; phing tests:unit -Denvname=${envname} -Dtestsuite=${testsuite})'" 
                     checkreturn="true" 
                     dir="${project_dir}" 
                     passthru="true" 
                     level="error"/>
 
-                <exec command="${docker_bin} exec -u $(id -u):$(id -g) -t ${project} sh -c '(cd /var/www/html &amp;&amp; phing tests:integration -Denv=${env} -Dtestsuite=${testsuite})'" 
+                <exec command="${docker_bin} exec -u $(id -u):$(id -g) -t ${project} sh -c '(cd /var/www/html &amp;&amp; phing tests:integration -Denvname=${envname} -Dtestsuite=${testsuite})'" 
                     checkreturn="true" 
                     dir="${project_dir}" 
                     passthru="true" 

@@ -32,10 +32,10 @@
     </target>
 
     <target name="tests:integration:prepare" hidden="true">
-        <copy file="${build_dir}/${env}/dev/tests/integration/phpunit.xml"
+        <copy file="${build_dir}/${envname}/dev/tests/integration/phpunit.xml"
               tofile="${project_dir}/dev/tests/integration/phpunit.xml"
               overwrite="true"/>
-        <copy file="${build_dir}/${env}/dev/tests/integration/etc/install-config-mysql.php"
+        <copy file="${build_dir}/${envname}/dev/tests/integration/etc/install-config-mysql.php"
               tofile="${project_dir}/dev/tests/integration/etc/install-config-mysql.php"
               overwrite="true"/>
         <copy file="${build_dir}/shared/dev/tests/integration/etc/config-global.php"
@@ -80,7 +80,7 @@
     </target>
 
     <target name="tests:run" hidden="true">
-        <echo message="Executing tests with environment '${env}'"/>
+        <echo message="Executing tests with environment '${envname}'"/>
         <if>
             <isset property="folder"/>
             <then>

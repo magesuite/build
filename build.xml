@@ -3,13 +3,16 @@
 <!-- This file should not be used directly and always be included from your project's build.xml -->
 
 <project name="creativeshop-base" default="help" description="creativeshop base build definition">
-
     <!-- Warning! The dot will resolve to the directory from which this file was included (phing was run) -->
     <resolvepath propertyName="project_dir" file="."/>
 
     <property name="testsuite" value="creativestyle"/>
     <property name="build_dir" value="${project_dir}/build"/>
     <property file="${build_dir}/build.properties"/>
+
+
+    <includepath classpath="${build_dir}/tasks/" />
+    <taskdef name="slack" classname="SlackNotificationTask" />
 
     <import file="${build_dir}/tests.xml"/>
     <import file="${build_dir}/backend.xml"/>
@@ -18,17 +21,17 @@
 
     <if>
         <not>
-            <isset property="env"/>
+            <isset property="envname"/>
         </not>
         <then>
-            <property name="env" value="dev"/>
-            <warn message="Property `env` not set, using default value 'dev'."/>
+            <property name="envname" value="dev"/>
+            <warn message="Property `envname` not set, using default value 'dev'."/>
         </then>
     </if>
 
     <target name="tests:all">
         <if>
-            <equals arg1="${env}" arg2="ci"/>
+            <equals arg1="${envnamename}" arg2="ci"/>
             <then>
                 <phingcall target="docker:tests"/>
             </then>
@@ -42,6 +45,20 @@
         <phingcall target="backend:build"/>
         <phingcall target="frontend:build"/>
         <phingcall target="tests:all"/>
+    </target>
+
+    <target name="ci-build">
+        <property name="envname" value="ci"/>
+        <trycatch property="exception">
+            <try>
+                <phingcall target="build"/>
+            </try>
+            <catch>
+                <slack webhookUrl="${slack.webhook_url}" channel="${slack.channel}" title="${project} build #${env.BUILD_NUMBER} failed!" message="&lt;${env.BUILD_URL}|Go to build&gt;" color="#CF0000"/>
+                <fail message="${exception}"/>
+            </catch>
+        </trycatch>
+        <slack webhookUrl="${slack.webhook_url}" channel="${slack.channel}" title="${project} build #${env.BUILD_NUMBER} succeeded!" message="&lt;${env.BUILD_URL}|Go to build&gt;" color="#00CF00"/>
     </target>
 
     <target name="help" hidden="true">
