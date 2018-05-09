@@ -49,8 +49,6 @@
     </target>
 
     <target name="ci-build">
-        <property name="envname" value="ci" override="true"/>
-        <warn message="CI build overrides `envname` to value `ci`"/>
         <trycatch property="exception">
             <try>
                 <phingcall target="build"/>
