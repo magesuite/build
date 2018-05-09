@@ -32,7 +32,7 @@
 
     <target name="tests:all">
         <if>
-            <equals arg1="${envnamename}" arg2="ci"/>
+            <equals arg1="${envname}" arg2="ci"/>
             <then>
                 <phingcall target="docker:tests"/>
             </then>
