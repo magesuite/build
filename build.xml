@@ -13,6 +13,7 @@
 
     <includepath classpath="${build_dir}/tasks/" />
     <taskdef name="slack" classname="SlackNotificationTask" />
+    <taskdef name="tv" classname="TvNotificationTask" />
 
     <import file="${build_dir}/tests.xml"/>
     <import file="${build_dir}/backend.xml"/>
@@ -55,10 +56,12 @@
             </try>
             <catch>
                 <slack webhookUrl="${slack.webhook_url}" channel="${slack.channel}" title="${project} build #${env.BUILD_NUMBER} failed!" message="&lt;${env.BUILD_URL}|Go to build&gt;" color="#CF0000"/>
+                <tv message="${project} build failed" type="alert" say="en"/>
                 <fail message="${exception}"/>
             </catch>
         </trycatch>
         <slack webhookUrl="${slack.webhook_url}" channel="${slack.channel}" title="${project} build #${env.BUILD_NUMBER} succeeded!" message="&lt;${env.BUILD_URL}|Go to build&gt;" color="#00CF00"/>
+        <tv message="${project} build succeeded!" type="success"/>
     </target>
 
     <target name="help" hidden="true">
