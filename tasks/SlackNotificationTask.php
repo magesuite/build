@@ -22,7 +22,7 @@ class SlackNotificationTask extends AbstractRestApiCallTask
     /**
      * @var string
      */
-    protected $title = 'Phing Build Notification';
+    protected $title;
 
     /**
      * @var string
@@ -71,17 +71,22 @@ class SlackNotificationTask extends AbstractRestApiCallTask
 
     protected function prepareMessage(): array
     {
-        return [
+        $msg = [
             'channel' => $this->channel,
             'attachments' => [
                 [
                     'link_names' => 1,
                     'color' => $this->color,
-                    'title' => $this->title,
                     'text' => $this->message
                 ]
             ]
         ];
+
+        if ($this->title) {
+            $msg['attachments']['title'] = $this->title;
+        }
+
+        return $msg;
     }
 
     protected function validateParams()

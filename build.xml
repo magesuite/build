@@ -49,6 +49,8 @@
     </target>
 
     <target name="ci-build">
+        <slack webhookUrl="${slack.webhook_url}" channel="${slack.channel}" message=":rocket: Build started: *${project} #${env.BUILD_NUMBER}* | &lt;${env.BUILD_URL}|Go to build&gt;" color="#2D8BF1"/>
+        <tv message="&lt;strong&gt;${project}&lt;/strong&gt; build started!" type="normal"/>
         <property name="envname" value="ci" override="true"/>
         <warn message="CI build overrides `envname` to value `ci`"/>
         <trycatch property="exception">
@@ -56,13 +58,13 @@
                 <phingcall target="build"/>
             </try>
             <catch>
-                <slack webhookUrl="${slack.webhook_url}" channel="${slack.channel}" title="${project} build #${env.BUILD_NUMBER} failed!" message="&lt;${env.BUILD_URL}|Go to build&gt;" color="#CF0000"/>
-                <tv message="${project} build failed" type="alert" say="en"/>
+                <slack webhookUrl="${slack.webhook_url}" channel="${slack.channel}" message=":heavy_exclamation_mark: Build failed: *${project} #${env.BUILD_NUMBER}* | &lt;${env.BUILD_URL}|Go to build&gt;" color="#C51B20"/>
+                <tv message="&lt;strong&gt;${project}&lt;/strong&gt; build failed!" type="alert" say="en"/>
                 <fail message="${exception}"/>
             </catch>
         </trycatch>
-        <slack webhookUrl="${slack.webhook_url}" channel="${slack.channel}" title="${project} build #${env.BUILD_NUMBER} succeeded!" message="&lt;${env.BUILD_URL}|Go to build&gt;" color="#00CF00"/>
-        <tv message="${project} build succeeded!" type="success"/>
+        <slack webhookUrl="${slack.webhook_url}" channel="${slack.channel}" message=":white_check_mark: Build succeeded: *${project} #${env.BUILD_NUMBER}* | &lt;${env.BUILD_URL}|Go to build&gt;" color="#29D664"/>
+        <tv message="&lt;strong&gt;${project}&lt;/strong&gt; build succeeded!" type="success"/>
     </target>
 
     <target name="help" hidden="true">
