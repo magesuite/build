@@ -50,6 +50,17 @@
                     dir="${project_dir}" 
                     passthru="true" 
                     level="error"/>
+                    
+                <exec command="${docker_bin} exec -t ${project} sh -c 'rm -rf /var/www/generated/* /var/www/var/cache/*'" 
+                    checkreturn="true" dir="${project_dir}" 
+                    passthru="true" 
+                    level="error"/>
+
+                <exec command="${docker_bin} exec -t ${project} sh -c 'rm -rf /var/www/html/dev/tests/integration/tmp/*'" 
+                    checkreturn="true" 
+                    dir="${project_dir}" 
+                    passthru="true" 
+                    level="error"/>
 
                 <exec command="${docker_bin} exec -u $(id -u):$(id -g) -t ${project} sh -c '(cd /var/www/html &amp;&amp; phing tests:integration -Denvname=${envname} -Dtestsuite=${testsuite})'" 
                     checkreturn="true" 
