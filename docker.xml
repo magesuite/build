@@ -34,7 +34,7 @@
             <try>
                 <phingcall target="docker:start"/>
 
-                <exec command="${docker_bin} exec -t ${project} sh -c 'rm -rf /var/www/generated/* /var/www/var/cache/*'" 
+                <exec command="${docker_bin} exec -t ${project} sh -c 'rm -rf /var/www/html/generated/* /var/www/var/cache/*'" 
                     checkreturn="true" dir="${project_dir}" 
                     passthru="true" 
                     level="error"/>
@@ -51,7 +51,7 @@
                     passthru="true" 
                     level="error"/>
                     
-                <exec command="${docker_bin} exec -t ${project} sh -c 'rm -rf /var/www/generated/* /var/www/var/cache/*'" 
+                <exec command="${docker_bin} exec -t ${project} sh -c 'rm -rf /var/www/html/generated/* /var/www/var/cache/*'" 
                     checkreturn="true" dir="${project_dir}" 
                     passthru="true" 
                     level="error"/>
