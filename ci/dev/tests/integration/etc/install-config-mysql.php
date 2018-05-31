@@ -12,6 +12,7 @@ return [
     'db-prefix' => '',
     'backend-frontname' => 'backend',
     'es-hosts' => '127.0.0.1:9200',
+    'base-url' => 'http://localhost/',
     'admin-user' => \Magento\TestFramework\Bootstrap::ADMIN_NAME,
     'admin-password' => \Magento\TestFramework\Bootstrap::ADMIN_PASSWORD,
     'admin-email' => \Magento\TestFramework\Bootstrap::ADMIN_EMAIL,
