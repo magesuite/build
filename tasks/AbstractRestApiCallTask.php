@@ -14,6 +14,7 @@ abstract class AbstractRestApiCallTask extends Task
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($curl, CURLOPT_MAXREDIRS, 10);
+        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 1);
         curl_setopt($curl, CURLOPT_HTTPHEADER, [
             'Content-type: ' . $contentType,
             'Content-length: ' . strlen($payload),
