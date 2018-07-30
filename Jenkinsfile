@@ -3,6 +3,9 @@ pipeline {
     
     parameters {
         string(name: 'ARTIFACT_REPO', description: 'Artifact git repo URL')
+        string(name: 'ARTIFACT_BRANCH', defaultValue: 'master', description: 'Artifact git repo URL')
+        string(name: 'CREATIVESHOP_REPO', defaultValue: 'git@gitlab.creativestyle.pl:m2c/m2c.git', description: 'Project repo URL')
+        string(name: 'CREATIVESHOP_BRANCH', description: 'Project repo branch')
     }
     
     stages {
@@ -10,9 +13,23 @@ pipeline {
             steps {
                 checkout([
                     $class: 'GitSCM',
-                    branches: [[name: "*/master"]],
-                    userRemoteConfigs: [[credentialsId: '1aa37c8c-73f1-4b3c-a2e5-149de20b989c', url: params.ARTIFACT_REPO]]
+                    branches: [[name: "*/${params.ARTIFACT_BRANCH}"]],
+                    userRemoteConfigs: [[url: params.ARTIFACT_REPO, credentialsId: '1aa37c8c-73f1-4b3c-a2e5-149de20b989c']]
                 ])
+            }
+        }
+        
+        stage('Install current project configuration') {
+            steps {
+                dir('creativeshop-project') {
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: "*/${params.CREATIVESHOP_BRANCH}"]],
+                        userRemoteConfigs: [[url: params.CREATIVESHOP_REPO, credentialsId: '1aa37c8c-73f1-4b3c-a2e5-149de20b989c']]
+                    ])
+                    
+                    fileOperations([fileCopyOperation(excludes: '.git', flattenFiles: false, includes: '*', targetLocation: "${WORKSPACE}")])
+                }
             }
         }
     
