@@ -5,7 +5,7 @@ pipeline {
         string(name: 'ARTIFACT_REPO', description: 'Artifact git repo URL')
         string(name: 'ARTIFACT_BRANCH', defaultValue: 'master', description: 'Artifact git repo URL')
         string(name: 'CREATIVESHOP_REPO', defaultValue: 'git@gitlab.creativestyle.pl:m2c/m2c.git', description: 'Project repo URL')
-        string(name: 'CREATIVESHOP_BRANCH', description: 'Project repo branch')
+        string(name: 'CREATIVESHOP_BRANCH', defaultValue: params.CREATIVESHOP_BRANCH, description: 'Project repo branch')
     }
     
     stages {
