@@ -15,23 +15,23 @@ pipeline {
                 ])
             }
         }
-    }
     
-    stage('Decrypt composer auth') {
-        steps {
-            script {
-                sh 'ansible-vault --vault-password-file=~/.raccoon-vault-password --output=auth.json decrypt auth.json.encrypted'
-            }
-        } 
+        stage('Decrypt composer auth') {
+            steps {
+                script {
+                    sh 'ansible-vault --vault-password-file=~/.raccoon-vault-password --output=auth.json decrypt auth.json.encrypted'
+                }
+            } 
+        }
+        when { expression { return fileExists('auth.json.encrypted') && !fileExists('auth.json') } }
+        
+        stage('Install composer deps') {
+            steps {
+                script {
+                    sh 'php /usr/local/bin/composer update'
+                }
+            } 
+        }
+        when { expression { return !fileExists('vendor') } }
     }
-    when { expression { return fileExists('auth.json.encrypted') && !fileExists('auth.json') } }
-    
-    stage('Install composer deps') {
-        steps {
-            script {
-                sh 'php /usr/local/bin/composer update'
-            }
-        } 
-    }
-    when { expression { return !fileExists('vendor') } }
 }
