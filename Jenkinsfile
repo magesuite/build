@@ -7,11 +7,13 @@ pipeline {
     
     stages {
         stage('Clone current artifacts') {
-            checkout([
-                $class: 'GitSCM',
-                branches: [[name: "*/master"]],
-                userRemoteConfigs: [[credentialsId: '1aa37c8c-73f1-4b3c-a2e5-149de20b989c', url: params.ARTIFACT_REPO]]
-            ])
+            steps {
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: "*/master"]],
+                    userRemoteConfigs: [[credentialsId: '1aa37c8c-73f1-4b3c-a2e5-149de20b989c', url: params.ARTIFACT_REPO]]
+                ])
+            }
         }
     }
     
