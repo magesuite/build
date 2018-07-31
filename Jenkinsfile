@@ -28,7 +28,7 @@ pipeline {
                         userRemoteConfigs: [[url: params.CREATIVESHOP_REPO, credentialsId: '1aa37c8c-73f1-4b3c-a2e5-149de20b989c']]
                     ])
                     
-                    fileOperations([fileCopyOperation(excludes: '/.git,/composer.lock', flattenFiles: false, includes: '*', targetLocation: "${WORKSPACE}")])
+                    fileOperations([fileCopyOperation(excludes: '.git,composer.lock', flattenFiles: false, includes: '*', targetLocation: "${WORKSPACE}")])
                 }
             }
         }
