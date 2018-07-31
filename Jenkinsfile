@@ -30,7 +30,7 @@ pipeline {
                         userRemoteConfigs: [[url: params.CREATIVESHOP_REPO, credentialsId: params.GIT_CREDS]]
                     ])
                     
-                    fileOperations([fileCopyOperation(excludes: '.git,composer.lock', flattenFiles: false, includes: '*,.*', targetLocation: "${WORKSPACE}")])
+                    fileOperations([fileCopyOperation(excludes: '.git,composer.lock', flattenFiles: false, includes: '.gitignore,*', targetLocation: "${WORKSPACE}")])
                 }
             }
         }
@@ -59,9 +59,10 @@ pipeline {
                 script {
                     sshagent (credentials: [params.GIT_CREDS]) {
                         writeFile file: '.git/info/exclude', text: '''
-                            creativeshop-project
-                            vendor/**/.git
+creativeshop-project
+vendor/**/.git
                         '''
+                        
                         sh 'git add . -A'
                         sh 'git commit -m "${env.BUILD_NUMBER}"'
                         sh 'git push'
