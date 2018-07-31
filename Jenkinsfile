@@ -38,6 +38,7 @@ pipeline {
         stage('Decrypt composer auth') {
             steps {
                 script {
+                    sh 'env'
                     sh 'ansible-vault --vault-password-file=~/.raccoon-vault-password --output=auth.json decrypt auth.json.encrypted'
                 }
             } 
