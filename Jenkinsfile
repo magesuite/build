@@ -58,7 +58,10 @@ pipeline {
             steps {
                 script {
                     sshagent (credentials: [params.GIT_CREDS]) {
-                        writeFile file: '.git/info/exclude', text: 'creativeshop-project\n'
+                        writeFile file: '.git/info/exclude', text: '''
+                            creativeshop-project
+                            vendor/**/.git
+                        '''
                         sh 'git add . -A'
                         sh 'git commit -m "${env.BUILD_NUMBER}"'
                         sh 'git push'
