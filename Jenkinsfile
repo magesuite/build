@@ -64,13 +64,13 @@ pipeline {
             } 
         }
         
-        stage('Phing build') {
-            steps {
-                script {
-                    sh 'vendor/bin/phing ci-build'
-                }
-            } 
-        }
+        // stage('Phing build') {
+        //     steps {
+        //         script {
+        //             sh 'vendor/bin/phing ci-build'
+        //         }
+        //     } 
+        // }
         
         stage('Push artifacts') {
             steps {
