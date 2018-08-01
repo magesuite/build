@@ -80,7 +80,7 @@ pipeline {
                     // Store build nr for identifcation on server
                     Date buildDate = new Date()
                     
-                    writeFile file: 'pub/BUILD', text: JsonOutput.prettyPrint(JsonOutput.toJson([
+                    writeFile file: 'pub/BUILD.json', text: JsonOutput.prettyPrint(JsonOutput.toJson([
                         nr: env.BUILD_NUMBER,
                         date: buildDate.format('dd.MM.yyyy HH:mm:ss'),
                         timestamp: buildDate.getTime()
