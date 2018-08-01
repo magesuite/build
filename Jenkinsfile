@@ -82,6 +82,9 @@ pipeline {
 /app/etc/env.php
 .gitignore
 /auth.json
+/var/cache/
+/var/log/
+/generated/
                         '''
                         sh 'find vendor/ -type d -name ".git" | while read gd ; do mv "$gd" "$(dirname $gd)/.git-tmp" ; done'            
                         sh 'git add . -A'
