@@ -96,6 +96,7 @@ pipeline {
 /generated/
 /**/node_modules/
                         '''
+                        writeFile file: 'pub/BUILD', text: params.BUILD_NUMBER
                         sh 'find vendor/ -type d -name ".git" | while read gd ; do mv "$gd" "$(dirname $gd)/.git-tmp" ; done'            
                         sh 'git add . -A'
                         sh 'find vendor/ -type d -name ".git-tmp" | while read gd ; do mv "$gd" "$(dirname $gd)/.git" ; done'            
