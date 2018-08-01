@@ -64,19 +64,25 @@ pipeline {
             } 
         }
         
-        // stage('Phing build') {
-        //     steps {
-        //         script {
-        //             sh 'vendor/bin/phing ci-build'
-        //         }
-        //     } 
-        // }
+        stage('Phing build') {
+            steps {
+                script {
+                    sh 'vendor/bin/phing ci-build'
+                }
+            } 
+        }
         
         stage('Push artifacts') {
             steps {
                 script {
                     // Store build nr for identifcation on server
-                    writeFile file: 'pub/BUILD', text: env.BUILD_NUMBER + (new Date()).format('dd.MM.yyyy HH:mm:ss')
+                    Date buildDate = new Date()
+                    
+                    writeFile file: 'pub/BUILD', text: JsonOutput.toJson([
+                        nr: env.BUILD_NUMBER,
+                        date: buildDate.format('dd.MM.yyyy HH:mm:ss'),
+                        timestamp: buildDate.getTime()
+                    ])
                     
                     // Sync new artifacts
                     script {
