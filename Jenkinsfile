@@ -41,7 +41,7 @@ pipeline {
                     ])
                     
                     // This jenkins crap does not copy hidden files, but we don't need gitignore so it should be fine
-                    fileOperations([fileCopyOperation(excludes: '.git,.gitignore,composer.lock', flattenFiles: false, includes: '*', targetLocation: "${WORKSPACE}")])
+                    fileOperations([fileCopyOperation(excludes: '.git,.gitignore,composer.lock', flattenFiles: false, targetLocation: "${WORKSPACE}")])
                     
                     // script {
                     //     sh 'rsync -avz --exclude ".git" . "${WORKSPACE}/"'
