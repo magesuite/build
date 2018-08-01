@@ -81,33 +81,33 @@ pipeline {
             when { expression { return !fileExists('vendor') } }
         }
         
-        stage('Phing build') {
-            steps {
-                script {
-                    // sh 'vendor/bin/phing ci-build'
-                }
-            } 
-        }
+        // stage('Phing build') {
+        //     steps {
+        //         script {
+        //             sh 'vendor/bin/phing ci-build'
+        //         }
+        //     } 
+        // }
         
-        stage('Push artifacts') {
-            steps {
-                script {
-                    // // Store build nr for identifcation on server
-                    // writeFile file: 'pub/BUILD', text: params.BUILD_NUMBER
+        // stage('Push artifacts') {
+        //     steps {
+        //         script {
+        //             // Store build nr for identifcation on server
+        //             writeFile file: 'pub/BUILD', text: params.BUILD_NUMBER
                     
-                    // // Sync new artifacts
-                    // script {
-                    //     sh 'rsync -avz --delete . git-artifacts --e'
-                    // }
+        //             // Sync new artifacts
+        //             script {
+        //                 sh 'rsync -avz --delete . git-artifacts --e'
+        //             }
                     
-                    // dir ('git-artifacts') {
-                    //     sshagent (credentials: [params.GIT_CREDS]) {
-                    //         sh 'git commit -m "Build #${BUILD_NUMBER}"'
-                    //         sh 'git push origin HEAD:${ARTIFACT_BRANCH}'
-                    //     }
-                    // }
-                }
-            }
-        }
+        //             dir ('git-artifacts') {
+        //                 sshagent (credentials: [params.GIT_CREDS]) {
+        //                     sh 'git commit -m "Build #${BUILD_NUMBER}"'
+        //                     sh 'git push origin HEAD:${ARTIFACT_BRANCH}'
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
     }
 }
