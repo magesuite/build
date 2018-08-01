@@ -29,7 +29,7 @@ pipeline {
         stage('Clean workspace') {
             steps {
                 script {
-                    sh 'find . -maxdepth 1 -not -path "./git-artifacts" -exec rm -rf {} \\;'
+                    sh 'rm -rf build'
                 }
             }
             when { expression { return params.CLEAN_INSTALL } }
@@ -47,10 +47,12 @@ pipeline {
                 }
                 
                 script {
+                    // Create build dir if not existing
+                    sh '([ -d "build"] && mkdir build) || true'
                     // Install new project base
-                    sh 'rsync -avz git-creativeshop/ ${WORKSPACE}/ --exclude .git --exclude .gitignore'
+                    sh 'rsync -avz git-creativeshop/ build/ --exclude .git --exclude .gitignore'
                     // Copy lockfile from previous build for comparison if exists
-                    sh '([ -f git-artifacts/composer.lock ] && cp git-artifacts/composer.lock .) || true'
+                    sh '([ -f git-artifacts/composer.lock ] && cp git-artifacts/composer.lock build/) || true'
                     // Keep old lockfile for changes comparison
                     sh 'mv composer.lock composer.lock.previous'
                 }
@@ -59,9 +61,11 @@ pipeline {
     
         stage('Prepare deps for phing if new workspace') {
             steps {
-                script {
-                    sh '([ -f "auth.json.encrypted" ] && [ ! -f "auth.json" ] && ansible-vault --vault-password-file=~/.raccoon-vault-password --output=auth.json decrypt auth.json.encrypted) || echo "auth.json present, nothing to do"'
-                    sh '([ ! -d "vendor" ] && php /usr/local/bin/composer update) || echo "vendor exists, nothing to do"'
+                dir('build') {
+                    script {
+                        sh '([ -f "auth.json.encrypted" ] && [ ! -f "auth.json" ] && ansible-vault --vault-password-file=~/.raccoon-vault-password --output=auth.json decrypt auth.json.encrypted) || echo "auth.json present, nothing to do"'
+                        sh '([ ! -d "vendor" ] && php /usr/local/bin/composer update) || echo "vendor exists, nothing to do"'
+                    }
                 }
             } 
         }
@@ -80,7 +84,7 @@ pipeline {
                     // Store build nr for identifcation on server
                     Date buildDate = new Date()
                     
-                    writeFile file: 'pub/BUILD.json', text: JsonOutput.prettyPrint(JsonOutput.toJson([
+                    writeFile file: 'build/pub/BUILD.json', text: JsonOutput.prettyPrint(JsonOutput.toJson([
                         nr: env.BUILD_NUMBER,
                         date: buildDate.format('dd.MM.yyyy HH:mm:ss'),
                         timestamp: buildDate.getTime()
@@ -88,7 +92,7 @@ pipeline {
                     
                     // Sync new artifacts
                     script {
-                        sh "rsync -az --delete --stats . git-artifacts --exclude '/git-*' --exclude '.git'  --exclude '/build/' --exclude '/dev/' --exclude '/pub/media/' --exclude '/vendor/creativestyle/theme-*/**' --exclude '/app/etc/env.php' --exclude '/auth.json' --exclude '/var/**' --exclude '/generated/' --exclude 'node_modules/'"
+                        sh "rsync -az --delete --stats build git-artifacts/ --exclude '.git'  --exclude '/build/' --exclude '/dev/' --exclude '/pub/media/' --exclude '/vendor/creativestyle/theme-*/**' --exclude '/app/etc/env.php' --exclude '/auth.json' --exclude '/var/**' --exclude '/generated/' --exclude 'node_modules/'"
                     }
                     
                     dir ('git-artifacts') {
