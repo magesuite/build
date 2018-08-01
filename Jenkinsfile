@@ -64,33 +64,35 @@ pipeline {
             } 
         }
         
-        // stage('Phing build') {
-        //     steps {
-        //         script {
-        //             sh 'vendor/bin/phing ci-build'
-        //         }
-        //     } 
-        // }
+        stage('Phing build') {
+            steps {
+                script {
+                    sh 'env'
+                    // sh 'vendor/bin/phing ci-build'
+                }
+            } 
+        }
         
-        // stage('Push artifacts') {
-        //     steps {
-        //         script {
-        //             // Store build nr for identifcation on server
-        //             writeFile file: 'pub/BUILD', text: params.BUILD_NUMBER
+        stage('Push artifacts') {
+            steps {
+                script {
+                    // Store build nr for identifcation on server
+                    writeFile file: 'pub/BUILD', text: params.BUILD_NUMBER
                     
-        //             // Sync new artifacts
-        //             script {
-        //                 sh 'rsync -avz --delete . git-artifacts --e'
-        //             }
+                    // Sync new artifacts
+                    script {
+                        sh "rsync -avz --delete --delete-excluded . git-artifacts --exclude '/git-*' --exclude '.git'  --exclude '/build/' --exclude '/dev/' --exclude '/pub/media/' --exclude '/vendor/creativestyle/theme-*/**' --exclude '/app/etc/env.php' --exclude '/auth.json' --exclude '/var/**' --exclude '/generated/' --exclude 'node_modules/'"
+                    }
                     
-        //             dir ('git-artifacts') {
-        //                 sshagent (credentials: [params.GIT_CREDS]) {
-        //                     sh 'git commit -m "Build #${BUILD_NUMBER}"'
-        //                     sh 'git push origin HEAD:${ARTIFACT_BRANCH}'
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+                    dir ('git-artifacts') {
+                        sshagent (credentials: [params.GIT_CREDS]) {
+                            sh 'git add . -A'
+                            sh 'git commit -m "Build #${BUILD_NUMBER}"'
+                            sh 'git push origin HEAD:${ARTIFACT_BRANCH}'
+                        }
+                    }
+                }
+            }
+        }
     }
 }
