@@ -72,27 +72,27 @@ pipeline {
         //     } 
         // }
         
-        stage('Push artifacts') {
-            steps {
-                script {
-                    // Store build nr for identifcation on server
-                    writeFile file: 'pub/BUILD', text: env.BUILD_NUMBER + (new Date()).format('dd.MM.yyyy HH:mm:ss')
+        // stage('Push artifacts') {
+        //     steps {
+        //         script {
+        //             // Store build nr for identifcation on server
+        //             writeFile file: 'pub/BUILD', text: env.BUILD_NUMBER + (new Date()).format('dd.MM.yyyy HH:mm:ss')
                     
-                    // Sync new artifacts
-                    script {
-                        sh "rsync -az --delete --stats . git-artifacts --exclude '/git-*' --exclude '/vendor/**/.git'  --exclude '/build/' --exclude '/dev/' --exclude '/pub/media/' --exclude '/vendor/creativestyle/theme-*/**' --exclude '/app/etc/env.php' --exclude '/auth.json' --exclude '/var/**' --exclude '/generated/' --exclude 'node_modules/'"
-                    }
+        //             // Sync new artifacts
+        //             script {
+        //                 sh "rsync -az --delete --stats . git-artifacts --exclude '/git-*' --exclude '/vendor/**/.git'  --exclude '/build/' --exclude '/dev/' --exclude '/pub/media/' --exclude '/vendor/creativestyle/theme-*/**' --exclude '/app/etc/env.php' --exclude '/auth.json' --exclude '/var/**' --exclude '/generated/' --exclude 'node_modules/'"
+        //             }
                     
-                    dir ('git-artifacts') {
-                        sshagent (credentials: [params.GIT_CREDS]) {
-                            sh 'git add . -A'
-                            sh 'git commit -m "Build #${BUILD_NUMBER}"'
-                            sh 'git push origin HEAD:${ARTIFACT_BRANCH}'
-                            sh 'git gc --aggressive'
-                        }
-                    }
-                }
-            }
-        }
+        //             dir ('git-artifacts') {
+        //                 sshagent (credentials: [params.GIT_CREDS]) {
+        //                     sh 'git add . -A'
+        //                     sh 'git commit -m "Build #${BUILD_NUMBER}"'
+        //                     sh 'git push origin HEAD:${ARTIFACT_BRANCH}'
+        //                     sh 'git gc --aggressive'
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
     }
 }
