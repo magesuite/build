@@ -48,7 +48,7 @@ pipeline {
                     // Install new project base
                     sh 'rsync -avz git-creativeshop/ ${WORKSPACE}/ --exclude .git --exclude .gitignore'
                     // Copy lockfile from previous build for comparison if exists
-                    sh '[ -f composer.lock ] && cp composer.lock ${WORKSPACE}'
+                    sh '[ -f git-artifacts/composer.lock ] && cp git-artifacts/composer.lock .'
                     // Keep old lockfile for changes comparison
                     sh 'mv composer.lock composer.lock.previous'
                 }
