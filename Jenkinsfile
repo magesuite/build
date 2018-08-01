@@ -77,7 +77,7 @@ pipeline {
             steps {
                 script {
                     // Store build nr for identifcation on server
-                    writeFile file: 'pub/BUILD', text: params.BUILD_NUMBER
+                    writeFile file: 'pub/BUILD', text: env.BUILD_NUMBER + (new Date()).format('dd.MM.yyyy HH:mm:ss')
                     
                     // Sync new artifacts
                     script {
