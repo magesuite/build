@@ -25,7 +25,7 @@ pipeline {
         stage('Clean workspace') {
             steps {
                 script {
-                    sh 'find . -maxdepth 1 -not -path "./.git" -exec rm -rvf {} \;'
+                    sh 'find . -maxdepth 1 -not -path "./.git" -exec rm -rvf {} \\;'
                 }
             }
             when { expression { return params.CLEAN_INSTALL } }
