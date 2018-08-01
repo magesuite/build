@@ -2,7 +2,8 @@ pipeline {
     agent any;
     
     parameters {
-        
+        booleanParam(name: 'CLEAN_INSTALL', defaultValue: false, description: 'Install packages from scratch')
+        string(name: 'ARTIFACT_REPO', defaultValue: params.ARTIFACT_REPO, description: 'Artifact git repo URL')
         string(name: 'ARTIFACT_REPO', defaultValue: params.ARTIFACT_REPO, description: 'Artifact git repo URL')
         string(name: 'ARTIFACT_BRANCH', defaultValue: params.ARTIFACT_BRANCH ?: 'master', description: 'Artifact git repo URL')
         string(name: 'CREATIVESHOP_REPO', defaultValue: params.CREATIVESHOP_REPO ?: 'git@gitlab.creativestyle.pl:m2c/m2c.git', description: 'Project repo URL')
@@ -19,6 +20,15 @@ pipeline {
                     userRemoteConfigs: [[url: params.ARTIFACT_REPO, credentialsId: params.GIT_CREDS]]
                 ])
             }
+        }
+        
+        stage('Clean workspace') {
+            steps {
+                script {
+                    sh 'find . -maxdepth 1 -not -path "./.git" -exec rm -rvf {} \;'
+                }
+            }
+            when { expression { return params.CLEAN_INSTALL } }
         }
         
         stage('Install current project configuration') {
