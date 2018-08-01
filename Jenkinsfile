@@ -74,13 +74,20 @@ pipeline {
                 script {
                     sshagent (credentials: [params.GIT_CREDS]) {
                         writeFile file: '.git/info/exclude', text: '''
-creativeshop-project
-vendor/**/.git-tmp
+/creativeshop-project*
+/vendor/**/.git-tmp
+/build/**
+/dev/**
+/pub/media/**
+/vendor/creativestyle/theme-*/**
+/app/etc/env.php
+.gitignore
+/auth.json
                         '''
                         sh 'find vendor/ -type d -name ".git" | while read gd ; do mv "$gd" "$(dirname $gd)/.git-tmp" ; done'            
                         sh 'git add . -A'
                         sh 'find vendor/ -type d -name ".git-tmp" | while read gd ; do mv "$gd" "$(dirname $gd)/.git" ; done'            
-                        sh 'git commit -m "${env.BUILD_NUMBER}"'
+                        sh 'git commit -m "Build #${BUILD_NUMBER}"'
                         sh 'git push'
                     }
                 }
