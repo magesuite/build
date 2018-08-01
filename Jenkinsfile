@@ -58,8 +58,8 @@ pipeline {
         stage('Prepare deps for phing if new workspace') {
             steps {
                 script {
-                    sh '[ -f "auth.json.encrypted" ] && [ ! -f "auth.json" ] && ansible-vault --vault-password-file=~/.raccoon-vault-password --output=auth.json decrypt auth.json.encrypted'
-                    sh '[ ! -d "vendor" ] && php /usr/local/bin/composer update'
+                    sh '([ -f "auth.json.encrypted" ] && [ ! -f "auth.json" ] && ansible-vault --vault-password-file=~/.raccoon-vault-password --output=auth.json decrypt auth.json.encrypted) || echo "auth.json present, nothing to do'
+                    sh '([ ! -d "vendor" ] && php /usr/local/bin/composer update) || echo "vendor exists, nothing to do"'
                 }
             } 
         }
