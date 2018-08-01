@@ -14,18 +14,20 @@ pipeline {
     stages {
         stage('Clone current artifacts') {
             steps {
-                checkout([
-                    $class: 'GitSCM',
-                    branches: [[name: "*/${params.ARTIFACT_BRANCH}"]],
-                    userRemoteConfigs: [[url: params.ARTIFACT_REPO, credentialsId: params.GIT_CREDS]]
-                ])
+                dir('git-artifacts') {
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: "*/${params.ARTIFACT_BRANCH}"]],
+                        userRemoteConfigs: [[url: params.ARTIFACT_REPO, credentialsId: params.GIT_CREDS]]
+                    ])
+                }
             }
         }
         
         stage('Clean workspace') {
             steps {
                 script {
-                    sh 'find . -maxdepth 1 -not -path "./.git" -exec rm -rf {} \\;'
+                    sh 'find . -maxdepth 1 -not -path "./git-artifacts" -exec rm -rf {} \\;'
                 }
             }
             when { expression { return params.CLEAN_INSTALL } }
@@ -33,7 +35,8 @@ pipeline {
         
         stage('Install current project configuration') {
             steps {
-                dir('creativeshop-project') {
+                dir('git-creativeshop') {
+                    // Update project base
                     checkout([
                         $class: 'GitSCM',
                         branches: [[name: "*/${params.CREATIVESHOP_BRANCH}"]],
@@ -41,11 +44,21 @@ pipeline {
                     ])
                     
                     // This jenkins crap does not copy hidden files, but we don't need gitignore so it should be fine
-                    fileOperations([fileCopyOperation(excludes: '.git,.gitignore,composer.lock', flattenFiles: false, targetLocation: "${WORKSPACE}")])
-                    
-                    // script {
-                    //     sh 'rsync -avz --exclude ".git" . "${WORKSPACE}/"'
-                    // }
+                    fileOperations {
+                        fileCopyOperation(excludes: '.git,.gitignore', includes: '*', flattenFiles: false, targetLocation: "${WORKSPACE}")]
+                    }
+                }
+                
+                dir('git-artifacts') {
+                    // Copy lockfile from previous build for comparison if exists
+                    fileOperations {
+                        fileCopyOperation(excludes: '.git,.gitignore', includes: 'composer.lock', flattenFiles: false, targetLocation: "${WORKSPACE}")]
+                    }
+                }
+                
+                fileOperations {
+                    // Keep old lockfile for changes comparison
+                    fileRenameOperation('composer.lock', 'composer.lock.old')
                 }
             }
         }
@@ -68,10 +81,10 @@ pipeline {
             when { expression { return !fileExists('vendor') } }
         }
         
-        stage('Phinf build') {
+        stage('Phing build') {
             steps {
                 script {
-                    sh 'vendor/bin/phing ci-build'
+                    // sh 'vendor/bin/phing ci-build'
                 }
             } 
         }
@@ -79,30 +92,20 @@ pipeline {
         stage('Push artifacts') {
             steps {
                 script {
-                    sshagent (credentials: [params.GIT_CREDS]) {
-                        writeFile file: '.git/info/exclude', text: '''
-/creativeshop-project*
-/vendor/**/.git-tmp
-/build/**
-/dev/**
-/pub/media/**
-/vendor/creativestyle/theme-*/**
-/app/etc/env.php
-.gitignore
-/auth.json
-!/var/.htaccess
-/var/
-!/generated/.htaccess
-/generated/
-/**/node_modules/
-                        '''
-                        writeFile file: 'pub/BUILD', text: params.BUILD_NUMBER
-                        sh 'find vendor/ -type d -name ".git" | while read gd ; do mv "$gd" "$(dirname $gd)/.git-tmp" ; done'            
-                        sh 'git add . -A'
-                        sh 'find vendor/ -type d -name ".git-tmp" | while read gd ; do mv "$gd" "$(dirname $gd)/.git" ; done'            
-                        sh 'git commit -m "Build #${BUILD_NUMBER}"'
-                        sh 'git push origin HEAD:${ARTIFACT_BRANCH}'
-                    }
+                    // // Store build nr for identifcation on server
+                    // writeFile file: 'pub/BUILD', text: params.BUILD_NUMBER
+                    
+                    // // Sync new artifacts
+                    // script {
+                    //     sh 'rsync -avz --delete . git-artifacts --e'
+                    // }
+                    
+                    // dir ('git-artifacts') {
+                    //     sshagent (credentials: [params.GIT_CREDS]) {
+                    //         sh 'git commit -m "Build #${BUILD_NUMBER}"'
+                    //         sh 'git push origin HEAD:${ARTIFACT_BRANCH}'
+                    //     }
+                    // }
                 }
             }
         }
