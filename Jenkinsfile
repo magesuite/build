@@ -30,7 +30,12 @@ pipeline {
                         userRemoteConfigs: [[url: params.CREATIVESHOP_REPO, credentialsId: params.GIT_CREDS]]
                     ])
                     
-                    fileOperations([fileCopyOperation(excludes: '.git,composer.lock', flattenFiles: false, includes: '.gitignore,*', targetLocation: "${WORKSPACE}")])
+                    // This jenkins crap does not copy hidden files
+                    // fileOperations([fileCopyOperation(excludes: '.git,composer.lock', flattenFiles: false, includes: '.gitignore,*', targetLocation: "${WORKSPACE}")])
+                    
+                    script {
+                        sh 'rsync -avz --exclude ".git" . "${WORKSPACE}/"'
+                    }
                 }
             }
         }
