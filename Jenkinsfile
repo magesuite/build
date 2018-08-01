@@ -54,7 +54,7 @@ pipeline {
                     // Copy lockfile from previous build for comparison if exists
                     sh '([ -f git-artifacts/composer.lock ] && cp git-artifacts/composer.lock build/) || true'
                     // Keep old lockfile for changes comparison
-                    sh 'mv build/composer.lock build/composer.lock.previous'
+                    sh '([ -f "composer.lock" ] && mv build/composer.lock build/composer.lock.previous) || echo "No composer.lock found, strange, any steps skipped before, huh?"'
                 }
             }
         }
