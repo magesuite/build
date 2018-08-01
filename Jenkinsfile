@@ -40,12 +40,12 @@ pipeline {
                         userRemoteConfigs: [[url: params.CREATIVESHOP_REPO, credentialsId: params.GIT_CREDS]]
                     ])
                     
-                    // This jenkins crap does not copy hidden files
-                    // fileOperations([fileCopyOperation(excludes: '.git,composer.lock', flattenFiles: false, includes: '.gitignore,*', targetLocation: "${WORKSPACE}")])
+                    // This jenkins crap does not copy hidden files, but we don't need gitignore so it should be fine
+                    fileOperations([fileCopyOperation(excludes: '.git,.gitignore,composer.lock', flattenFiles: false, includes: '*', targetLocation: "${WORKSPACE}")])
                     
-                    script {
-                        sh 'rsync -avz --exclude ".git" . "${WORKSPACE}/"'
-                    }
+                    // script {
+                    //     sh 'rsync -avz --exclude ".git" . "${WORKSPACE}/"'
+                    // }
                 }
             }
         }
@@ -53,7 +53,6 @@ pipeline {
         stage('Decrypt composer auth') {
             steps {
                 script {
-                    sh 'env'
                     sh 'ansible-vault --vault-password-file=~/.raccoon-vault-password --output=auth.json decrypt auth.json.encrypted'
                 }
             } 
