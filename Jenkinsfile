@@ -50,7 +50,7 @@ pipeline {
                     // Create workspace dir if not existing
                     sh '([ -d "workspace"] && mkdir workspace) || true'
                     // Install new project base
-                    sh 'rsync -avz creativeshop workspace/ --exclude .git --exclude .gitignore'
+                    sh 'rsync -avz creativeshop/ workspace/ --exclude .git --exclude .gitignore'
                     // Copy lockfile from previous build for comparison if exists
                     sh '([ -f artifacts/composer.lock ] && cp artifacts/composer.lock workspace/) || true'
                     // Keep old lockfile for changes comparison
@@ -94,7 +94,7 @@ pipeline {
                     
                     // Sync new artifacts
                     script {
-                        sh "rsync -az --delete --stats workspace artifacts/ --exclude '.git'  --exclude '/build/' --exclude '/dev/' --exclude '/pub/media/' --exclude '/vendor/creativestyle/theme-*/**' --exclude '/app/etc/env.php' --exclude '/auth.json' --exclude '/var/**' --exclude '/generated/' --exclude 'node_modules/'"
+                        sh "rsync -az --delete --stats workspace/ artifacts/ --exclude '.git'  --exclude '/build/' --exclude '/dev/' --exclude '/pub/media/' --exclude '/vendor/creativestyle/theme-*/**' --exclude '/app/etc/env.php' --exclude '/auth.json' --exclude '/var/**' --exclude '/generated/' --exclude 'node_modules/'"
                     }
                     
                     dir ('artifacts') {
