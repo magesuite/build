@@ -42,23 +42,15 @@ pipeline {
                         branches: [[name: "*/${params.CREATIVESHOP_BRANCH}"]],
                         userRemoteConfigs: [[url: params.CREATIVESHOP_REPO, credentialsId: params.GIT_CREDS]]
                     ])
-                    
-                    // This jenkins crap does not copy hidden files, but we don't need gitignore so it should be fine
-                    fileOperations {
-                        fileCopyOperation(excludes: '.git,.gitignore', includes: '*', flattenFiles: false, targetLocation: "${WORKSPACE}")
-                    }
                 }
                 
-                dir('git-artifacts') {
+                script {
+                    // Install new project base
+                    sh 'rsync -avz git-creativeshop/ ${WORKSPACE}/ --exclude .git --exclude .gitignore'
                     // Copy lockfile from previous build for comparison if exists
-                    fileOperations {
-                        fileCopyOperation(excludes: '', includes: 'composer.lock', flattenFiles: false, targetLocation: "${WORKSPACE}")
-                    }
-                }
-                
-                fileOperations {
+                    sh '[ -f composer.lock ] && cp composer.lock ${WORKSPACE}'
                     // Keep old lockfile for changes comparison
-                    fileRenameOperation(source: 'composer.lock', destination: 'composer.lock.old')
+                    sh 'mv composer.lock composer.lock.previous'
                 }
             }
         }
