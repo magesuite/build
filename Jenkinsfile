@@ -68,6 +68,14 @@ pipeline {
             when { expression { return !fileExists('vendor') } }
         }
         
+        stage('Phinf build') {
+            steps {
+                script {
+                    sh 'vendor/bin/phing ci-build'
+                }
+            } 
+        }
+        
         stage('Push artifacts') {
             steps {
                 script {
