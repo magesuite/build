@@ -45,14 +45,14 @@ pipeline {
                     
                     // This jenkins crap does not copy hidden files, but we don't need gitignore so it should be fine
                     fileOperations {
-                        fileCopyOperation(excludes: '.git,.gitignore', includes: '*', flattenFiles: false, targetLocation: "${WORKSPACE}")]
+                        fileCopyOperation(excludes: '.git,.gitignore', includes: '*', flattenFiles: false, targetLocation: "${WORKSPACE}")
                     }
                 }
                 
                 dir('git-artifacts') {
                     // Copy lockfile from previous build for comparison if exists
                     fileOperations {
-                        fileCopyOperation(excludes: '.git,.gitignore', includes: 'composer.lock', flattenFiles: false, targetLocation: "${WORKSPACE}")]
+                        fileCopyOperation(excludes: '.git,.gitignore', includes: 'composer.lock', flattenFiles: false, targetLocation: "${WORKSPACE}")
                     }
                 }
                 
