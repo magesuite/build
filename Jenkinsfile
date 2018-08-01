@@ -16,7 +16,7 @@ pipeline {
     stages {
         stage('Clone current artifacts') {
             steps {
-                dir('git-artifacts') {
+                dir('artifacts') {
                     checkout([
                         $class: 'GitSCM',
                         branches: [[name: "*/${params.ARTIFACT_BRANCH}"]],
@@ -29,7 +29,7 @@ pipeline {
         stage('Clean workspace') {
             steps {
                 script {
-                    sh 'rm -rf build'
+                    sh 'rm -rf workspace'
                 }
             }
             when { expression { return params.CLEAN_INSTALL } }
@@ -37,7 +37,7 @@ pipeline {
         
         stage('Install current project configuration') {
             steps {
-                dir('git-creativeshop') {
+                dir('creativeshop') {
                     // Update project base
                     checkout([
                         $class: 'GitSCM',
@@ -47,21 +47,21 @@ pipeline {
                 }
                 
                 script {
-                    // Create build dir if not existing
-                    sh '([ -d "build"] && mkdir build) || true'
+                    // Create workspace dir if not existing
+                    sh '([ -d "workspace"] && mkdir workspace) || true'
                     // Install new project base
-                    sh 'rsync -avz git-creativeshop build/ --exclude .git --exclude .gitignore'
+                    sh 'rsync -avz creativeshop workspace/ --exclude .git --exclude .gitignore'
                     // Copy lockfile from previous build for comparison if exists
-                    sh '([ -f git-artifacts/composer.lock ] && cp git-artifacts/composer.lock build/) || true'
+                    sh '([ -f artifacts/composer.lock ] && cp artifacts/composer.lock workspace/) || true'
                     // Keep old lockfile for changes comparison
-                    sh '([ -f "composer.lock" ] && mv build/composer.lock build/composer.lock.previous) || echo "No composer.lock found, strange, any steps skipped before, huh?"'
+                    sh '([ -f "composer.lock" ] && mv workspace/composer.lock workspace/composer.lock.previous) || echo "No composer.lock found, strange, any steps skipped before, huh?"'
                 }
             }
         }
     
         stage('Prepare deps for phing if new workspace') {
             steps {
-                dir('build') {
+                dir('workspace') {
                     script {
                         sh '([ -f "auth.json.encrypted" ] && [ ! -f "auth.json" ] && ansible-vault --vault-password-file=~/.raccoon-vault-password --output=auth.json decrypt auth.json.encrypted) || echo "auth.json present, nothing to do"'
                         sh '([ ! -d "vendor" ] && php /usr/local/bin/composer update) || echo "vendor exists, nothing to do"'
@@ -72,8 +72,10 @@ pipeline {
         
         // stage('Phing build') {
         //     steps {
-        //         script {
-        //             sh 'vendor/bin/phing ci-build'
+        //         dir('workspace') {
+        //             script {
+        //                 sh 'vendor/bin/phing ci-build'
+        //             }
         //         }
         //     } 
         // }
@@ -84,7 +86,7 @@ pipeline {
                     // Store build nr for identifcation on server
                     Date buildDate = new Date()
                     
-                    writeFile file: 'build/pub/BUILD.json', text: JsonOutput.prettyPrint(JsonOutput.toJson([
+                    writeFile file: 'workspace/pub/BUILD.json', text: JsonOutput.prettyPrint(JsonOutput.toJson([
                         nr: env.BUILD_NUMBER,
                         date: buildDate.format('dd.MM.yyyy HH:mm:ss'),
                         timestamp: buildDate.getTime()
@@ -92,10 +94,10 @@ pipeline {
                     
                     // Sync new artifacts
                     script {
-                        sh "rsync -az --delete --stats build git-artifacts/ --exclude '.git'  --exclude '/build/build/' --exclude '/build/dev/' --exclude '/build/pub/media/' --exclude '/build/vendor/creativestyle/theme-*/**' --exclude '/build/app/etc/env.php' --exclude '/build/auth.json' --exclude '/build/var/**' --exclude '/build/generated/' --exclude 'node_modules/'"
+                        sh "rsync -az --delete --stats workspace artifacts/ --exclude '.git'  --exclude '/build/' --exclude '/dev/' --exclude '/pub/media/' --exclude '/vendor/creativestyle/theme-*/**' --exclude '/app/etc/env.php' --exclude '/auth.json' --exclude '/var/**' --exclude '/generated/' --exclude 'node_modules/'"
                     }
                     
-                    dir ('git-artifacts') {
+                    dir ('artifacts') {
                         sshagent (credentials: [params.GIT_CREDS]) {
                             sh 'git add . -A'
                             sh 'git commit -m "Build #${BUILD_NUMBER}"'
