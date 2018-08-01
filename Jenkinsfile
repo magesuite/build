@@ -55,22 +55,13 @@ pipeline {
             }
         }
     
-        stage('Decrypt composer auth') {
+        stage('Prepare deps for phing if new workspace') {
             steps {
                 script {
-                    sh 'ansible-vault --vault-password-file=~/.raccoon-vault-password --output=auth.json decrypt auth.json.encrypted'
+                    sh '[ -f "auth.json.encrypted" ] && [ ! -f "auth.json" ] && ansible-vault --vault-password-file=~/.raccoon-vault-password --output=auth.json decrypt auth.json.encrypted'
+                    sh '[ ! -d "vendor" ] && php /usr/local/bin/composer update'
                 }
             } 
-            when { expression { return fileExists('auth.json.encrypted') && !fileExists('auth.json') } }
-        }
-        
-        stage('Install composer deps') {
-            steps {
-                script {
-                    sh 'php /usr/local/bin/composer update'
-                }
-            } 
-            when { expression { return !fileExists('vendor') } }
         }
         
         // stage('Phing build') {
