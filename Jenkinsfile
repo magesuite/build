@@ -48,7 +48,7 @@ pipeline {
                     // Install new project base
                     sh 'rsync -avz git-creativeshop/ ${WORKSPACE}/ --exclude .git --exclude .gitignore'
                     // Copy lockfile from previous build for comparison if exists
-                    sh '[ -f git-artifacts/composer.lock ] && cp git-artifacts/composer.lock .'
+                    sh '([ -f git-artifacts/composer.lock ] && cp git-artifacts/composer.lock .) || true'
                     // Keep old lockfile for changes comparison
                     sh 'mv composer.lock composer.lock.previous'
                 }
@@ -67,8 +67,7 @@ pipeline {
         stage('Phing build') {
             steps {
                 script {
-                    sh 'env'
-                    // sh 'vendor/bin/phing ci-build'
+                    sh 'vendor/bin/phing ci-build'
                 }
             } 
         }
@@ -81,7 +80,7 @@ pipeline {
                     
                     // Sync new artifacts
                     script {
-                        sh "rsync -avz --delete --delete-excluded . git-artifacts --exclude '/git-*' --exclude '.git'  --exclude '/build/' --exclude '/dev/' --exclude '/pub/media/' --exclude '/vendor/creativestyle/theme-*/**' --exclude '/app/etc/env.php' --exclude '/auth.json' --exclude '/var/**' --exclude '/generated/' --exclude 'node_modules/'"
+                        sh "rsync -az --delete . git-artifacts --exclude '/git-*' --exclude '/vendor/**/.git'  --exclude '/build/' --exclude '/dev/' --exclude '/pub/media/' --exclude '/vendor/creativestyle/theme-*/**' --exclude '/app/etc/env.php' --exclude '/auth.json' --exclude '/var/**' --exclude '/generated/' --exclude 'node_modules/'"
                     }
                     
                     dir ('git-artifacts') {
@@ -89,6 +88,7 @@ pipeline {
                             sh 'git add . -A'
                             sh 'git commit -m "Build #${BUILD_NUMBER}"'
                             sh 'git push origin HEAD:${ARTIFACT_BRANCH}'
+                            sh 'git gc --aggressive'
                         }
                     }
                 }
