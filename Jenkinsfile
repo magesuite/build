@@ -50,11 +50,11 @@ pipeline {
                     // Create build dir if not existing
                     sh '([ -d "build"] && mkdir build) || true'
                     // Install new project base
-                    sh 'rsync -avz git-creativeshop/ build/ --exclude .git --exclude .gitignore'
+                    sh 'rsync -avz git-creativeshop build/ --exclude .git --exclude .gitignore'
                     // Copy lockfile from previous build for comparison if exists
                     sh '([ -f git-artifacts/composer.lock ] && cp git-artifacts/composer.lock build/) || true'
                     // Keep old lockfile for changes comparison
-                    sh 'mv composer.lock composer.lock.previous'
+                    sh 'mv build/composer.lock build/composer.lock.previous'
                 }
             }
         }
