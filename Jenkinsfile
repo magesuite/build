@@ -92,7 +92,7 @@ pipeline {
                     
                     // Sync new artifacts
                     script {
-                        sh "rsync -az --delete --stats build git-artifacts/ --exclude '.git'  --exclude '/build/' --exclude '/dev/' --exclude '/pub/media/' --exclude '/vendor/creativestyle/theme-*/**' --exclude '/app/etc/env.php' --exclude '/auth.json' --exclude '/var/**' --exclude '/generated/' --exclude 'node_modules/'"
+                        sh "rsync -az --delete --stats build git-artifacts/ --exclude '.git'  --exclude '/build/build/' --exclude '/build/dev/' --exclude '/build/pub/media/' --exclude '/build/vendor/creativestyle/theme-*/**' --exclude '/build/app/etc/env.php' --exclude '/build/auth.json' --exclude '/build/var/**' --exclude '/build/generated/' --exclude 'node_modules/'"
                     }
                     
                     dir ('git-artifacts') {
