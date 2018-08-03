@@ -13,6 +13,10 @@ pipeline {
         credentials(name: 'GIT_CREDS', defaultValue: params.GIT_CREDS ?: '1aa37c8c-73f1-4b3c-a2e5-149de20b989c', description: 'Git repo access credentials')
     }
     
+    environment {
+        BUILD_USER=currentBuild.rawBuild.getCause(Cause.UserIdCause).getUserId()
+    }
+    
     stages {
         stage('Clone current artifacts') {
             steps {
