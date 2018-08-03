@@ -63,7 +63,7 @@
                 <fail message="${exception}"/>
             </catch>
         </trycatch>
-        <slack webhookUrl="${slack.webhook_url}" channel="${slack.channel}" message=":white_check_mark: Build of *${project}* is a success!| &lt;${env.BUILD_URL}| Job #${env.BUILD_NUMBER}&gt;" color="#29D664"/>
+        <slack webhookUrl="${slack.webhook_url}" channel="${slack.channel}" message=":white_check_mark: Build of :package: *${project}* is a success!| &lt;${env.BUILD_URL}| Job #${env.BUILD_NUMBER}&gt;" color="#29D664"/>
         <tv message="&lt;strong&gt;${project}&lt;/strong&gt; build succeeded!" type="success"/>
     </target>
 
