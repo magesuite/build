@@ -70,15 +70,15 @@ pipeline {
             } 
         }
         
-        // stage('Phing build') {
-        //     steps {
-        //         dir('workspace') {
-        //             script {
-        //                 sh 'vendor/bin/phing ci-build'
-        //             }
-        //         }
-        //     } 
-        // }
+        stage('Phing build') {
+            steps {
+                dir('workspace') {
+                    script {
+                        sh 'vendor/bin/phing ci-build'
+                    }
+                }
+            } 
+        }
         
         stage('Push artifacts') {
             steps {
