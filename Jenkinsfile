@@ -1,6 +1,7 @@
 import groovy.json.JsonOutput
 
-def buildUser = currentBuild.rawBuild.getCause(Cause.UserIdCause).getUserId() ?: 'Jenkins'
+def buildCause = currentBuild.rawBuild.getCause(Cause.UserIdCause)
+def buildUser = buildCause ? buildCause.getUserId() : 'Jenkins'
 
 pipeline {
     agent any;
