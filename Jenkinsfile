@@ -14,7 +14,7 @@ pipeline {
     }
     
     environment {
-        BUILD_USER=currentBuild.rawBuild.getCause(Cause.UserIdCause) ? currentBuild.rawBuild.getCause(Cause.UserIdCause).getUserId() : 'Jenkins' 
+        BUILD_USER=(currentBuild.rawBuild.getCause(Cause.UserIdCause) ? currentBuild.rawBuild.getCause(Cause.UserIdCause).getUserId() : 'Jenkins')
     }
     
     stages {
