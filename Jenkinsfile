@@ -12,6 +12,8 @@ pipeline {
         string(name: 'ARTIFACT_BRANCH', defaultValue: params.ARTIFACT_BRANCH ?: 'master', description: 'Artifact git repo URL')
         string(name: 'CREATIVESHOP_REPO', defaultValue: params.CREATIVESHOP_REPO ?: 'git@gitlab.creativestyle.pl:m2c/m2c.git', description: 'Project repo URL')
         string(name: 'CREATIVESHOP_BRANCH', defaultValue: params.CREATIVESHOP_BRANCH, description: 'Project repo branch')
+        string(name: 'PROJECT_NAME', defaultValue: params.PROJECT_NAME ?: 'creativeshop', description: 'Name of the project')
+        string(name: 'SLACK_CHANNEL', defaultValue: params.SLACK_CHANNEL ?: '#m2c', description: 'Slack channel for notifications')
         credentials(name: 'GIT_CREDS', defaultValue: params.GIT_CREDS ?: '1aa37c8c-73f1-4b3c-a2e5-149de20b989c', description: 'Git repo access credentials')
     }
     
@@ -20,6 +22,16 @@ pipeline {
     }
     
     stages {
+        stage("Send notifications") {
+            steps {
+                script {
+                    if (params.SLACK_CHANNEL) {
+                        slackSend color: '#2D8BF1', channel: params.SLACK_CHANNEL, message: ":gear: Build of *${params.PROJECT_NAME}* has been started. | <${env.BUILD_URL}| Job #${env.BUILD_NUMBER}> \n :pray: Started by _${BUILD_USER}_"
+                    }
+                }
+            }
+        }
+        
         stage('Clone current artifacts') {
             steps {
                 dir('artifacts') {
@@ -111,6 +123,24 @@ pipeline {
                             sh 'git gc --aggressive'
                         }
                     }
+                }
+            }
+        }
+    }
+    
+    post {
+        failure {
+            script {
+                if (params.SLACK_CHANNEL) {
+                    slackSend color: '#C51B20', channel: params.SLACK_CHANNEL, message: ":heavy_exclamation_mark: Building *${params.PROJECT_NAME}* has failed! | <${env.BUILD_URL}| Job #${env.BUILD_NUMBER}>"
+                }
+            }
+        }
+        
+        success {
+            script {
+                if (params.SLACK_CHANNEL) {
+                    slackSend color: '#29D664', channel: params.SLACK_CHANNEL, message: ":white_check_mark: Build of :package: *${params.PROJECT_NAME}* is a success! | <${env.BUILD_URL}| Job #${env.BUILD_NUMBER}>"
                 }
             }
         }
