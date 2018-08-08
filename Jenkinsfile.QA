@@ -3,16 +3,6 @@ def BUILD_USER = currentBuild.rawBuild.getCause(Cause.UserIdCause) ? currentBuil
 pipeline {
     agent any
 
-    environment {
-        AWS_PROFILE="${params.AWS_PROFILE}"
-        ANSIBLE_VAULT_PASSWORD_FILE="${params.VAULT_PASSWORD_FILE}"
-        BUILD_USER=currentBuild.rawBuild.getCause(Cause.UserIdCause).getUserId()
-        RELEASE_DIR="${env.HOME}/.creativeshop-releases/${params.PROJECT_NAME}-${params.PROJECT_STAGE}"
-        PREV_ARTIFACT_COMMIT = readFile env.RELEASE_DIR + '/HASH'
-        PREV_ARTIFACT_DATE = readFile env.RELEASE_DIR + '/DATE'
-        PREV_ARTIFACT_NAME = readFile env.RELEASE_DIR + '/NAME'
-    }
-
     parameters {
         string(name: 'PROJECT_NAME', defaultValue: params.PROJECT_NAME ?: 'creativeshop', description: 'Name of the project')
         string(name: 'TEST_DEPLOYMENT_URL', defaultValue: params.TEST_DEPLOYMENT_URL ?: 'https://dev.creativeshop.io', description: 'Url to project test server')
