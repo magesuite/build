@@ -1,0 +1,60 @@
+def BUILD_USER = currentBuild.rawBuild.getCause(Cause.UserIdCause) ? currentBuild.rawBuild.getCause(Cause.UserIdCause).getUserId() : 'Jenkins'
+
+pipeline {
+    agent any
+
+    environment {
+        AWS_PROFILE="${params.AWS_PROFILE}"
+        ANSIBLE_VAULT_PASSWORD_FILE="${params.VAULT_PASSWORD_FILE}"
+        BUILD_USER=currentBuild.rawBuild.getCause(Cause.UserIdCause).getUserId()
+        RELEASE_DIR="${env.HOME}/.creativeshop-releases/${params.PROJECT_NAME}-${params.PROJECT_STAGE}"
+        PREV_ARTIFACT_COMMIT = readFile env.RELEASE_DIR + '/HASH'
+        PREV_ARTIFACT_DATE = readFile env.RELEASE_DIR + '/DATE'
+        PREV_ARTIFACT_NAME = readFile env.RELEASE_DIR + '/NAME'
+    }
+
+    parameters {
+        string(name: 'PROJECT_NAME', defaultValue: params.PROJECT_NAME ?: 'creativeshop', description: 'Name of the project')
+        string(name: 'TEST_DEPLOYMENT_URL', defaultValue: params.TEST_DEPLOYMENT_URL ?: 'https://dev.creativeshop.io', description: 'Url to project test server')
+        string(name: 'ARTIFACT_REPO', defaultValue: params.ARTIFACT_REPO, description: 'Artifact git repo URL')
+        string(name: 'ARTIFACT_BRANCH', defaultValue: params.ARTIFACT_BRANCH ?: 'master', description: 'Artifact git repo URL')
+        string(name: 'SLACK_CHANNEL', defaultValue: params.SLACK_CHANNEL ?: '#m2c-notifications', description: 'Slack channel for notifications')
+        credentials(name: 'GIT_CREDS', defaultValue: params.GIT_CREDS ?: '1aa37c8c-73f1-4b3c-a2e5-149de20b989c', description: 'Git repo access credentials')
+    }
+
+    stages {
+        stage("Get currently tested build") {
+            steps {
+                script {
+                    BUILD_HASH = httpRequest(params.TEST_DEPLOYMENT_URL + '/BUILD_HASH').contents.trim()
+                }
+            }
+        }
+    
+        stage("Clone artifact repo") {
+            steps {
+                script { 
+                    dir('artifacts') {
+                        checkout([
+                            $class: 'GitSCM',
+                            branches: [[name: params.ARTIFACT_BRANCH]],
+                            userRemoteConfigs: [[url: params.ARTIFACT_REPO, credentialsId: params.GIT_CREDS]]
+                        ])
+                    }
+                }
+            }
+        }
+        
+        stage("Tag stable release") {
+            steps {
+                script {
+                    dir('artifacts') {
+                        BUILD_NAME = sh(returnStdout: true, script: "git show ${BUILD_HASH} -s --format=%s").trim()
+                    }
+                }
+            }
+        }
+    }
+}
+
+
