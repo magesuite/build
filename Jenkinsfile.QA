@@ -19,6 +19,7 @@ pipeline {
             steps {
                 script {
                     BUILD_HASH = httpRequest(params.TEST_DEPLOYMENT_URL + '/BUILD_HASH').content.trim()
+                    print httpRequest(params.TEST_DEPLOYMENT_URL + '/BUILD.json'
                     BUILD_DATA = new JsonSlurperClassic().parseText(httpRequest(params.TEST_DEPLOYMENT_URL + '/BUILD.json').content.trim())
                     print BUILD_DATA.dump()
                 }
