@@ -51,7 +51,10 @@ pipeline {
                         }
                         
                         BUILD_NAME = sh(returnStdout: true, script: "git show ${BUILD_HASH} -s --format=%s").trim()
-                        sh "git tag -a ${STABLE_TAG} ${BUILD_HASH} -m ''"
+                        
+                        writeFile file: 'msg.tmp', text: STABLE_TAG_MESSAGE
+                        
+                        sh "git tag -a ${STABLE_TAG} ${BUILD_HASH} -m \"`cat msg.tmp`\""
                         sh "git push origin ${STABLE_TAG}"
                     }
                 }
@@ -66,10 +69,8 @@ pipeline {
                     if (params.NOTES) {
                         msg += "\n>>> ${params.NOTES}"
                     }
-                    
-                    writeFile file: 'msg.tmp', text: msg
                                 
-                    slackSend color: '#CF0E5C', channel: params.SLACK_CHANNEL, message: `cat msg`'
+                    slackSend color: '#CF0E5C', channel: params.SLACK_CHANNEL, message: msg
                 }
            }
        }
