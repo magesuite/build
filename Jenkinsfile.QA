@@ -51,7 +51,7 @@ pipeline {
                         }
                         
                         BUILD_NAME = sh(returnStdout: true, script: "git show ${BUILD_HASH} -s --format=%s").trim()
-                        sh "git tag -a ${STABLE_TAG} ${BUILD_HASH} -m '${STABLE_TAG_MESSAGE}'"
+                        sh "git tag -a ${STABLE_TAG} ${BUILD_HASH} -m '$${STABLE_TAG_MESSAGE}'"
                         sh "git push origin ${STABLE_TAG}"
                     }
                 }
