@@ -41,6 +41,7 @@ pipeline {
                 script {
                     dir('artifacts') {
                         BUILD_NAME = sh(returnStdout: true, script: "git show ${BUILD_HASH} -s --format=%s").trim()
+                        print BUILD_NAME
                     }
                 }
             }
