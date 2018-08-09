@@ -43,13 +43,34 @@ pipeline {
             steps {
                 script {
                     dir('artifacts') {
-                        STABLE_TAG = "qa-${BUILD_DATA.nr}"
+                        STABLE_TAG = "quality-assured-build-${BUILD_DATA.nr}"
+                        STABLE_TAG_MESSAGE = "Quality assured by: ${BUILD_USER}"
+                        
+                        if (params.NOTES) {
+                            STABLE_TAG_MESSAGE += "\nNotes: ${params.NOTES}"
+                        }
+                        
                         BUILD_NAME = sh(returnStdout: true, script: "git show ${BUILD_HASH} -s --format=%s").trim()
-                        sh "git tag -a ${STABLE_TAG} ${BUILD_HASH} -m '${params.NOTES}'"
+                        sh "git tag -a ${STABLE_TAG} ${BUILD_HASH} -m '${STABLE_TAG_MESSAGE}'"
+                        sh "git push origin ${STABLE_TAG}"
                     }
                 }
             }
         }
+        
+        stage("Send notifications") {
+           steps {
+                script {
+                    def msg = ":quality_assured_2: _${BUILD_NAME}_ of <${TEST_DEPLOYMENT_URL}|${PROJECT_NAME}> has received QA mark from *${BUILD_USER}*\n :package: Tagged with *${STABLE_TAG}*"
+                    
+                    if (params.NOTES) {
+                        msg += "\n>>> ${params.NOTES}"
+                    }
+                                
+                    slackSend color: '#CF0E5C', channel: params.SLACK_CHANNEL, message: msg
+                }
+           }
+       }
     }
 }
 
