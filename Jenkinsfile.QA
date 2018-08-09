@@ -16,8 +16,8 @@ pipeline {
         stage("Get currently tested build") {
             steps {
                 script {
-                    BUILD_HASH = httpRequest(params.TEST_DEPLOYMENT_URL + '/BUILD_HASH')
-                    print BUILD_HASH.dump()
+                    BUILD_HASH = httpRequest(params.TEST_DEPLOYMENT_URL + '/BUILD_HASH').content.trim()
+                    print BUILD_HASH
                 }
             }
         }
