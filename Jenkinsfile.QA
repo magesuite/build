@@ -20,7 +20,6 @@ pipeline {
                 script {
                     BUILD_HASH = httpRequest(params.TEST_DEPLOYMENT_URL + '/BUILD_HASH').content.trim()
                     BUILD_DATA =  readJSON text: httpRequest(params.TEST_DEPLOYMENT_URL + '/BUILD.json').content
-                    print BUILD_DATA.dump()
                 }
             }
         }
@@ -43,8 +42,9 @@ pipeline {
             steps {
                 script {
                     dir('artifacts') {
+                        STABLE_TAG = "qa-${BUILD_DATA.nr}"
                         BUILD_NAME = sh(returnStdout: true, script: "git show ${BUILD_HASH} -s --format=%s").trim()
-                        
+                        sh "git tag -a ${STABLE_TAG} ${BUILD_HASH} -m "This is just a test"
                     }
                 }
             }
