@@ -1,3 +1,5 @@
+import groovy.json.JsonSlurperClassic
+
 def BUILD_USER = currentBuild.rawBuild.getCause(Cause.UserIdCause) ? currentBuild.rawBuild.getCause(Cause.UserIdCause).getUserId() : 'Jenkins'
 
 pipeline {
@@ -17,7 +19,8 @@ pipeline {
             steps {
                 script {
                     BUILD_HASH = httpRequest(params.TEST_DEPLOYMENT_URL + '/BUILD_HASH').content.trim()
-                    print BUILD_HASH
+                    BUILD_DATA = new JsonSlurperClassic().parseText(httpRequest(params.TEST_DEPLOYMENT_URL + '/BUILD.json').content.trim())
+                    print BUILD_DATA.dump()
                 }
             }
         }
@@ -41,7 +44,7 @@ pipeline {
                 script {
                     dir('artifacts') {
                         BUILD_NAME = sh(returnStdout: true, script: "git show ${BUILD_HASH} -s --format=%s").trim()
-                        print BUILD_NAME
+                        
                     }
                 }
             }
