@@ -6,6 +6,7 @@ pipeline {
     agent any
 
     parameters {
+        string(name: 'NOTES', defaulValue: '', description: 'Any notes you want to include with the QA mark')
         string(name: 'PROJECT_NAME', defaultValue: params.PROJECT_NAME ?: 'creativeshop', description: 'Name of the project')
         string(name: 'TEST_DEPLOYMENT_URL', defaultValue: params.TEST_DEPLOYMENT_URL ?: 'https://dev.creativeshop.io', description: 'Url to project test server')
         string(name: 'ARTIFACT_REPO', defaultValue: params.ARTIFACT_REPO, description: 'Artifact git repo URL')
@@ -44,7 +45,7 @@ pipeline {
                     dir('artifacts') {
                         STABLE_TAG = "qa-${BUILD_DATA.nr}"
                         BUILD_NAME = sh(returnStdout: true, script: "git show ${BUILD_HASH} -s --format=%s").trim()
-                        sh "git tag -a ${STABLE_TAG} ${BUILD_HASH} -m "This is just a test"
+                        sh "git tag -a ${STABLE_TAG} ${BUILD_HASH} -m '${params.NOTES}'"
                     }
                 }
             }
