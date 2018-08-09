@@ -6,7 +6,7 @@ pipeline {
     agent any
 
     parameters {
-        string(name: 'NOTES', defaulValue: '', description: 'Any notes you want to include with the QA mark')
+        string(name: 'NOTES', defaultValue: '', description: 'Any notes you want to include with the QA mark')
         string(name: 'PROJECT_NAME', defaultValue: params.PROJECT_NAME ?: 'creativeshop', description: 'Name of the project')
         string(name: 'TEST_DEPLOYMENT_URL', defaultValue: params.TEST_DEPLOYMENT_URL ?: 'https://dev.creativeshop.io', description: 'Url to project test server')
         string(name: 'ARTIFACT_REPO', defaultValue: params.ARTIFACT_REPO, description: 'Artifact git repo URL')
