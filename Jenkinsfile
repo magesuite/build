@@ -72,7 +72,7 @@ pipeline {
                     // Copy lockfile from previous build for comparison if exists
                     sh '([ -f artifacts/composer.lock ] && cp artifacts/composer.lock workspace/) || true'
                     // Keep old lockfile for changes comparison
-                    sh '([ -f "composer.lock" ] && mv workspace/composer.lock workspace/composer.lock.previous) || echo "No composer.lock found, strange, any steps skipped before, huh?"'
+                    sh '([ -f "workspace/composer.lock" ] && mv workspace/composer.lock workspace/composer.lock.previous) || echo "No composer.lock found, strange, any steps skipped before, huh?"'
                 }
             }
         }
@@ -94,7 +94,7 @@ pipeline {
                     script {
                         sh 'vendor/bin/phing ci-build'
                         // Compute changelog
-                        sh '([ -f "composer.lock" ] && php71 /usr/local/bin composer-changelog composer.lock.previous composer.lock --show-commits --vendor-directory=workspace/vendor > BUILD_CHANGELOG) || true'
+                        sh '([ -f "composer.lock" ] && php71 /usr/local/bin composer-changelog composer.lock.previous composer.lock --show-commits --vendor-directory=vendor > BUILD_CHANGELOG) || true'
                     }
                 }
             } 
