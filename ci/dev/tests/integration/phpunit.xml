@@ -68,7 +68,7 @@
         <!-- Metrics for Bamboo Profiler Output in PHP file that returns array -->
         <!--<const name="TESTS_BAMBOO_PROFILER_METRICS_FILE" value="../../build/profiler_metrics.php"/>-->
         <!-- Magento mode for tests execution. Possible values are "default", "developer" and "production". -->
-        <const name="TESTS_MAGENTO_MODE" value="production"/>
+        <const name="TESTS_MAGENTO_MODE" value="developer"/>
         <!-- Minimum error log level to listen for. Possible values: -1 ignore all errors, and level constants form http://tools.ietf.org/html/rfc5424 standard -->
         <const name="TESTS_ERROR_LOG_LISTENER_LEVEL" value="-1"/>
         <!-- Connection parameters for MongoDB library tests -->
