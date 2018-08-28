@@ -1,5 +1,7 @@
 import groovy.json.JsonOutput
 
+def buildUser = currentBuild.rawBuild.getCause(Cause.UserIdCause) ? currentBuild.rawBuild.getCause(Cause.UserIdCause).getUserId() : 'Jenkins'
+
 pipeline {
     agent any;
     
@@ -9,14 +11,26 @@ pipeline {
         string(name: 'ARTIFACT_BRANCH', defaultValue: params.ARTIFACT_BRANCH ?: 'master', description: 'Artifact git repo URL')
         string(name: 'CREATIVESHOP_REPO', defaultValue: params.CREATIVESHOP_REPO ?: 'git@gitlab.creativestyle.pl:m2c/m2c.git', description: 'Project repo URL')
         string(name: 'CREATIVESHOP_BRANCH', defaultValue: params.CREATIVESHOP_BRANCH, description: 'Project repo branch')
+        string(name: 'PROJECT_NAME', defaultValue: params.PROJECT_NAME ?: 'creativeshop', description: 'Name of the project')
+        string(name: 'SLACK_CHANNEL', defaultValue: params.SLACK_CHANNEL ?: '#m2c', description: 'Slack channel for notifications')
         credentials(name: 'GIT_CREDS', defaultValue: params.GIT_CREDS ?: '1aa37c8c-73f1-4b3c-a2e5-149de20b989c', description: 'Git repo access credentials')
     }
     
     environment {
-        BUILD_USER=currentBuild.rawBuild.getCause(Cause.UserIdCause).getUserId()
+        BUILD_USER="${buildUser}"
     }
     
     stages {
+        stage("Send notifications") {
+            steps {
+                script {
+                    if (params.SLACK_CHANNEL) {
+                        slackSend color: '#2D8BF1', channel: params.SLACK_CHANNEL, message: ":gear: Build of *${params.PROJECT_NAME}* has been started. | <${env.BUILD_URL}| Job #${env.BUILD_NUMBER}> \n :pray: Started by _${BUILD_USER}_"
+                    }
+                }
+            }
+        }
+        
         stage('Clone current artifacts') {
             steps {
                 dir('artifacts') {
@@ -57,7 +71,7 @@ pipeline {
                     // Copy lockfile from previous build for comparison if exists
                     sh '([ -f artifacts/composer.lock ] && cp artifacts/composer.lock workspace/) || true'
                     // Keep old lockfile for changes comparison
-                    sh '([ -f "composer.lock" ] && mv workspace/composer.lock workspace/composer.lock.previous) || echo "No composer.lock found, strange, any steps skipped before, huh?"'
+                    sh '([ -f "workspace/composer.lock" ] && mv workspace/composer.lock workspace/composer.lock.previous) || echo "No composer.lock found, strange, any steps skipped before, huh?"'
                 }
             }
         }
@@ -75,9 +89,15 @@ pipeline {
         
         stage('Phing build') {
             steps {
+                dir('artifacts') {
+                    sh '([ ! -d "CHANGELOGS" ] && mkdir "CHANGELOGS") || true'
+                }
+                
                 dir('workspace') {
                     script {
                         sh 'vendor/bin/phing ci-build'
+                        // Compute changelog
+                        sh '([ -f "composer.lock.previous" ] && php71 /usr/local/bin/composer-changelog composer.lock.previous composer.lock --show-commits --vendor-directory=vendor > "../artifacts/CHANGELOGS/BUILD_${BUILD_NUMBER}") || true'
                     }
                 }
             } 
@@ -97,7 +117,7 @@ pipeline {
                     
                     // Sync new artifacts
                     script {
-                        sh "rsync -az --delete --stats workspace/ artifacts/ --exclude '.git'  --exclude '/build/' --exclude '/dev/' --exclude '/pub/media/' --exclude '/vendor/creativestyle/theme-*/**' --exclude '/app/etc/env.php' --exclude '/auth.json' --exclude '/var/**' --exclude '/generated/' --exclude 'node_modules/'"
+                        sh "rsync -az --delete --stats workspace/ artifacts/ --exclude '.git'  --exclude 'CHANGELOGS' --exclude '/build/' --exclude '/dev/' --exclude '/pub/media/' --exclude '/vendor/creativestyle/theme-*/**' --exclude '/app/etc/env.php' --exclude '/auth.json' --exclude '/var/**' --exclude '/generated/'"
                     }
                     
                     dir ('artifacts') {
@@ -108,6 +128,24 @@ pipeline {
                             sh 'git gc --aggressive'
                         }
                     }
+                }
+            }
+        }
+    }
+    
+    post {
+        failure {
+            script {
+                if (params.SLACK_CHANNEL) {
+                    slackSend color: '#C51B20', channel: params.SLACK_CHANNEL, message: ":heavy_exclamation_mark: Building *${params.PROJECT_NAME}* has failed! | <${env.BUILD_URL}| Job #${env.BUILD_NUMBER}>"
+                }
+            }
+        }
+        
+        success {
+            script {
+                if (params.SLACK_CHANNEL) {
+                    slackSend color: '#29D664', channel: params.SLACK_CHANNEL, message: ":white_check_mark: Build of :package: *${params.PROJECT_NAME}* is a success! | <${env.BUILD_URL}| Job #${env.BUILD_NUMBER}>"
                 }
             }
         }

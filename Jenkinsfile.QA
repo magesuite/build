@@ -1,0 +1,80 @@
+import groovy.json.JsonSlurperClassic
+
+def BUILD_USER = currentBuild.rawBuild.getCause(Cause.UserIdCause) ? currentBuild.rawBuild.getCause(Cause.UserIdCause).getUserId() : 'Jenkins'
+
+pipeline {
+    agent any
+
+    parameters {
+        string(name: 'NOTES', defaultValue: '', description: 'Any notes you want to include with the QA mark')
+        string(name: 'PROJECT_NAME', defaultValue: params.PROJECT_NAME ?: 'creativeshop', description: 'Name of the project')
+        string(name: 'TEST_DEPLOYMENT_URL', defaultValue: params.TEST_DEPLOYMENT_URL ?: 'https://dev.creativeshop.io', description: 'Url to project test server')
+        string(name: 'ARTIFACT_REPO', defaultValue: params.ARTIFACT_REPO, description: 'Artifact git repo URL')
+        string(name: 'ARTIFACT_BRANCH', defaultValue: params.ARTIFACT_BRANCH ?: 'master', description: 'Artifact git repo URL')
+        string(name: 'SLACK_CHANNEL', defaultValue: params.SLACK_CHANNEL ?: '#m2c-notifications', description: 'Slack channel for notifications')
+        credentials(name: 'GIT_CREDS', defaultValue: params.GIT_CREDS ?: '1aa37c8c-73f1-4b3c-a2e5-149de20b989c', description: 'Git repo access credentials')
+    }
+
+    stages {
+        stage("Get currently tested build") {
+            steps {
+                script {
+                    BUILD_HASH = httpRequest(params.TEST_DEPLOYMENT_URL + '/BUILD_HASH').content.trim()
+                    BUILD_DATA =  readJSON text: httpRequest(params.TEST_DEPLOYMENT_URL + '/BUILD.json').content
+                }
+            }
+        }
+    
+        stage("Clone artifact repo") {
+            steps {
+                script { 
+                    dir('artifacts') {
+                        checkout([
+                            $class: 'GitSCM',
+                            branches: [[name: params.ARTIFACT_BRANCH]],
+                            userRemoteConfigs: [[url: params.ARTIFACT_REPO, credentialsId: params.GIT_CREDS]]
+                        ])
+                    }
+                }
+            }
+        }
+        
+        stage("Tag stable release") {
+            steps {
+                script {
+                    dir('artifacts') {
+                        STABLE_TAG = "quality-assured-build-${BUILD_DATA.nr}"
+                        STABLE_TAG_MESSAGE = "Quality assured by: ${BUILD_USER}"
+                        
+                        if (params.NOTES) {
+                            STABLE_TAG_MESSAGE += "\nNotes: ${params.NOTES}"
+                        }
+                        
+                        BUILD_NAME = sh(returnStdout: true, script: "git show ${BUILD_HASH} -s --format=%s").trim()
+                        
+                        writeFile file: 'msg.tmp', text: STABLE_TAG_MESSAGE
+                        
+                        sh "git tag -a ${STABLE_TAG} ${BUILD_HASH} -m \"`cat msg.tmp`\""
+                        sh "git push origin ${STABLE_TAG}"
+                    }
+                }
+            }
+        }
+        
+        stage("Send notifications") {
+           steps {
+                script {
+                    def msg = ":quality_assured_2: _${BUILD_NAME}_ of <${TEST_DEPLOYMENT_URL}|${PROJECT_NAME}> has received QA mark from *${BUILD_USER}*\n :package: Tagged with *${STABLE_TAG}*"
+                    
+                    if (params.NOTES) {
+                        msg += "\n>>> ${params.NOTES}"
+                    }
+                                
+                    slackSend color: '#CF0E5C', channel: params.SLACK_CHANNEL, message: msg
+                }
+           }
+       }
+    }
+}
+
+
