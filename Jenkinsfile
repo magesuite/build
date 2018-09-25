@@ -14,6 +14,7 @@ pipeline {
         string(name: 'PROJECT_NAME', defaultValue: params.PROJECT_NAME ?: 'creativeshop', description: 'Name of the project')
         string(name: 'SLACK_CHANNEL', defaultValue: params.SLACK_CHANNEL ?: '#m2c', description: 'Slack channel for notifications')
         credentials(name: 'GIT_CREDS', defaultValue: params.GIT_CREDS ?: '1aa37c8c-73f1-4b3c-a2e5-149de20b989c', description: 'Git repo access credentials')
+        choice(name: 'BUILD_TYPE', description: 'What are we building?', choices: 'creativeshop\nmagento')
     }
     
     environment {
@@ -95,7 +96,12 @@ pipeline {
                 
                 dir('workspace') {
                     script {
-                        sh 'vendor/bin/phing ci-build'
+                        if (params.BUILD_TYPE == 'creativeshop') {
+                            sh 'vendor/bin/phing ci-build'
+                        } else {
+                            sh 'php /usr/local/bin/composer update'
+                        }
+                        
                         // Compute changelog
                         sh '([ -f "composer.lock.previous" ] && php71 /usr/local/bin/composer-changelog composer.lock.previous composer.lock --show-commits --vendor-directory=vendor > "../artifacts/CHANGELOGS/BUILD_${BUILD_NUMBER}") || true'
                     }
