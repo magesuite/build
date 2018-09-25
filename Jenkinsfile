@@ -81,7 +81,7 @@ pipeline {
                 dir('workspace') {
                     script {
                         sh '([ -f "auth.json.encrypted" ] && [ ! -f "auth.json" ] && ansible-vault --vault-password-file=~/.raccoon-vault-password --output=auth.json decrypt auth.json.encrypted) || echo "auth.json present, nothing to do"'
-                        sh '([ ! -d "vendor" ] && php /usr/local/bin/composer update) || echo "vendor exists, nothing to do"'
+                        sh '([ ! -d "vendor" ] && [ -f "composer.json" ] && php /usr/local/bin/composer update) || echo "vendor exists, nothing to do"'
                     }
                 }
             } 
@@ -95,7 +95,7 @@ pipeline {
                 
                 dir('workspace') {
                     script {
-                        sh 'vendor/bin/phing ci-build'
+                        sh '([ -f "vendor/bin/phing"] && vendor/bin/phing ci-build) || /usr/local/bin/phing ci-build'
                         // Compute changelog
                         sh '([ -f "composer.lock.previous" ] && php71 /usr/local/bin/composer-changelog composer.lock.previous composer.lock --show-commits --vendor-directory=vendor > "../artifacts/CHANGELOGS/BUILD_${BUILD_NUMBER}") || true'
                     }
