@@ -95,7 +95,7 @@ pipeline {
                 
                 dir('workspace') {
                     script {
-                        sh '([ -f "vendor/bin/phing"] && vendor/bin/phing ci-build) || /usr/local/bin/phing ci-build'
+                        sh '([ -f "vendor/bin/phing" ] && vendor/bin/phing ci-build) || /usr/local/bin/phing ci-build'
                         // Compute changelog
                         sh '([ -f "composer.lock.previous" ] && php71 /usr/local/bin/composer-changelog composer.lock.previous composer.lock --show-commits --vendor-directory=vendor > "../artifacts/CHANGELOGS/BUILD_${BUILD_NUMBER}") || true'
                     }
