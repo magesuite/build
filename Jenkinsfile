@@ -13,6 +13,7 @@ pipeline {
         string(name: 'CREATIVESHOP_BRANCH', defaultValue: params.CREATIVESHOP_BRANCH, description: 'Project repo branch')
         string(name: 'PROJECT_NAME', defaultValue: params.PROJECT_NAME ?: 'creativeshop', description: 'Name of the project')
         string(name: 'SLACK_CHANNEL', defaultValue: params.SLACK_CHANNEL ?: '#m2c', description: 'Slack channel for notifications')
+        string(name: 'PHP', defaultValue: params.PHP ?: 'php', description: 'PHP binary')
         credentials(name: 'GIT_CREDS', defaultValue: params.GIT_CREDS ?: '1aa37c8c-73f1-4b3c-a2e5-149de20b989c', description: 'Git repo access credentials')
     }
     
@@ -81,7 +82,7 @@ pipeline {
                 dir('workspace') {
                     script {
                         sh '([ -f "auth.json.encrypted" ] && [ ! -f "auth.json" ] && ansible-vault --vault-password-file=~/.raccoon-vault-password --output=auth.json decrypt auth.json.encrypted) || echo "auth.json present, nothing to do"'
-                        sh '([ ! -d "vendor" ] && [ -f "composer.json" ] && php /usr/local/bin/composer update) || echo "vendor exists, nothing to do"'
+                        sh '([ ! -d "vendor" ] && [ -f "composer.json" ] && ${PHP} /usr/local/bin/composer update) || echo "vendor exists, nothing to do"'
                     }
                 }
             } 
@@ -96,7 +97,7 @@ pipeline {
                 dir('workspace') {
                     script {
                         // Use global phing if local one does not exist
-                        sh '([ -f "vendor/bin/phing" ] && vendor/bin/phing ci-build) || ([ ! -f "vendor/bin/phing" ] && /usr/local/bin/phing ci-build)'
+                        sh '([ -f "vendor/bin/phing" ] && ${PHP} vendor/bin/phing ci-build) || ([ ! -f "vendor/bin/phing" ] && ${PHP} /usr/local/bin/phing ci-build)'
                         // Compute changelog
                         sh '([ -f "composer.lock.previous" ] && php71 /usr/local/bin/composer-changelog composer.lock.previous composer.lock --show-commits --vendor-directory=vendor > "../artifacts/CHANGELOGS/BUILD_${BUILD_NUMBER}") || true'
                     }
