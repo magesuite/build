@@ -119,7 +119,7 @@ pipeline {
                     
                     // Sync new artifacts
                     script {
-                        sh "rsync -az --delete --stats workspace/ artifacts/ --exclude '.git'  --exclude 'CHANGELOGS' --exclude '/build/' --exclude '/dev/' --exclude '/pub/media/' --exclude '/vendor/creativestyle/theme-*/**' --exclude '/app/etc/env.php' --exclude '/auth.json' --exclude '/var/**' --exclude '/generated/'"
+                        sh "rsync -az --delete --stats workspace/ artifacts/ --exclude '.git'  --exclude 'CHANGELOGS' --exclude '/build/' --exclude '/dev/' --exclude '/pub/media/' --exclude '/vendor/creativestyle/theme-*/**' --exclude '/app/etc/env.php' --exclude '/auth.json' --exclude '/var/**' --exclude '/app/code/Magento/' --exclude '/generated/'"
                     }
                     
                     dir ('artifacts') {
