@@ -41,10 +41,10 @@
     <target name="backend:build" depends="backend:decrypt-auth">
         <!-- Double update so the patches are applied -->
         <composer composer="${composer_bin}" command="update">
-            <arg>--no-interaction</arg>
+            <arg value="--no-interaction"/>
         </composer>
         <composer composer="${composer_bin}" command="update">
-            <arg>--no-interaction</arg>
+            <arg value="--no-interaction"/>
         </composer>
         <phingcall target="backend:hacks:install"/>
     </target>
