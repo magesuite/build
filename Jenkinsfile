@@ -8,7 +8,8 @@ pipeline {
     parameters {
         booleanParam(name: 'CLEAN_INSTALL', defaultValue: false, description: 'Install packages from scratch')
         string(name: 'ARTIFACT_REPO', defaultValue: params.ARTIFACT_REPO, description: 'Artifact git repo URL')
-        string(name: 'ARTIFACT_BRANCH', defaultValue: params.ARTIFACT_BRANCH ?: 'master', description: 'Artifact git repo URL')
+        string(name: 'ARTIFACT_BRANCH', defaultValue: params.ARTIFACT_BRANCH ?: 'master', description: 'Artifact repo branch')
+        string(name: 'ARTIFACT_FAILED_BRANCH', defaultValue: params.ARTIFACT_FAILED_BRANCH ?: 'failed', description: 'Artifact repo branch for failed builds')
         string(name: 'CREATIVESHOP_REPO', defaultValue: params.CREATIVESHOP_REPO ?: 'git@gitlab.creativestyle.pl:m2c/m2c.git', description: 'Project repo URL')
         string(name: 'CREATIVESHOP_BRANCH', defaultValue: params.CREATIVESHOP_BRANCH, description: 'Project repo branch')
         string(name: 'PROJECT_NAME', defaultValue: params.PROJECT_NAME ?: 'creativeshop', description: 'Name of the project')
@@ -38,6 +39,14 @@ pipeline {
                     checkout([
                         $class: 'GitSCM',
                         branches: [[name: "*/${params.ARTIFACT_BRANCH}"]],
+                        userRemoteConfigs: [[url: params.ARTIFACT_REPO, credentialsId: params.GIT_CREDS]]
+                    ])
+                }
+                
+                dir('failed_artifacts') {
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: "*/${params.ARTIFACT_FAILED_BRANCH}"]],
                         userRemoteConfigs: [[url: params.ARTIFACT_REPO, credentialsId: params.GIT_CREDS]]
                     ])
                 }
@@ -138,6 +147,17 @@ pipeline {
     post {
         failure {
             script {
+                sh "rsync -az --delete --stats workspace/ failed_artifacts/ --exclude '.git'  --exclude 'CHANGELOGS' --exclude '/dev/' --exclude '/auth.json' --exclude '/app/code/Magento/'"
+            
+                dir ('failed_artifacts') {
+                    sshagent (credentials: [params.GIT_CREDS]) {
+                        sh 'git add . -A'
+                        sh 'git commit -m "Failed Build #${BUILD_NUMBER} - DO NOT EVER DEPLOY ME!"'
+                        sh 'git push origin HEAD:${ARTIFACT_FAILED_BRANCH}'
+                        sh 'git gc --aggressive'
+                    }
+                }
+
                 if (params.SLACK_CHANNEL) {
                     slackSend color: '#C51B20', channel: params.SLACK_CHANNEL, message: ":heavy_exclamation_mark: Building *${params.PROJECT_NAME}* has failed! | <${env.BUILD_URL}| Job #${env.BUILD_NUMBER}>"
                 }
