@@ -46,6 +46,7 @@ pipeline {
                 dir('failed_artifacts') {
                     checkout([
                         $class: 'GitSCM',
+                        useHeadIfNotFound: true,
                         branches: [[name: "*/${params.ARTIFACT_FAILED_BRANCH}"]],
                         userRemoteConfigs: [[url: params.ARTIFACT_REPO, credentialsId: params.GIT_CREDS]]
                     ])
