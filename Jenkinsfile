@@ -149,7 +149,7 @@ pipeline {
     post {
         failure {
             script {
-                sh "rsync -az --delete --stats workspace/ failed_artifacts/ --exclude '.git'  --exclude 'CHANGELOGS' --exclude '/dev/' --exclude '/auth.json' --exclude '/app/code/Magento/'"
+                sh "rsync -az --delete --stats workspace/ failed_artifacts/ --exclude '.git'  --exclude 'CHANGELOGS' --exclude '/build/' --exclude '/dev/' --exclude '/pub/media/' --exclude '/vendor/creativestyle/theme-*/**' --exclude '/app/etc/env.php' --exclude '/auth.json' --exclude '/var/**' --exclude '/app/code/Magento/' --exclude '/generated/'"
             
                 dir ('failed_artifacts') {
                     sshagent (credentials: [params.GIT_CREDS]) {
@@ -163,7 +163,7 @@ pipeline {
                 }
 
                 if (params.SLACK_CHANNEL) {
-                    slackSend color: '#C51B20', channel: params.SLACK_CHANNEL, message: ":heavy_exclamation_mark: Building *${params.PROJECT_NAME}* has failed! | <${env.BUILD_URL}| Job #${env.BUILD_NUMBER}>\n<https://gitlab.creativestyle.pl/creativeshop-build-artifacts/${params.PROJECT_NAME}/commit/${GIT_FAILED_ARTIFACT_COMMIT}| Failed Build>"
+                    slackSend color: '#C51B20', channel: params.SLACK_CHANNEL, message: ":heavy_exclamation_mark: Building *${params.PROJECT_NAME}* has failed! | <${env.BUILD_URL}| Job #${env.BUILD_NUMBER}>\n:package: <https://gitlab.creativestyle.pl/creativeshop-build-artifacts/${params.PROJECT_NAME}/commit/${GIT_FAILED_ARTIFACT_COMMIT}| See failed build artifacts>"
                 }
             }
         }
