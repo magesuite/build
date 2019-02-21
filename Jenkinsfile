@@ -155,7 +155,7 @@ pipeline {
                     sshagent (credentials: [params.GIT_CREDS]) {
                         sh 'git add . -A'
                         sh 'git commit -m "Failed Build #${BUILD_NUMBER} - DO NOT EVER DEPLOY ME!"'
-                        sh 'git push origin HEAD:${params.ARTIFACT_FAILED_BRANCH}'
+                        sh 'git push origin HEAD:' + ${params.ARTIFACT_FAILED_BRANCH}
                         sh 'git gc --aggressive'
                     }
 
