@@ -154,8 +154,8 @@ pipeline {
                 dir ('failed_artifacts') {
                     sshagent (credentials: [params.GIT_CREDS]) {
                         sh 'git add . -A'
-                        sh 'git commit -m "Failed Build #${BUILD_NUMBER} - DO NOT EVER DEPLOY ME!"'
-                        sh 'git push origin HEAD:' + params.ARTIFACT_FAILED_BRANCH
+                        sh 'git commit -m "Failed Build #${BUILD_NUMBER} - DO NOT EVER DEPLOY ME!" || true'
+                        sh 'git push origin HEAD:' + params.ARTIFACT_FAILED_BRANCH + ' || true'
                         sh 'git gc --aggressive'
                     }
 
