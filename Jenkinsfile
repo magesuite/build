@@ -38,11 +38,12 @@ pipeline {
                 dir('artifacts') {
                     checkout([
                         $class: 'GitSCM',
+                        depth: 1,
                         branches: [[name: "*/${params.ARTIFACT_BRANCH}"]],
                         userRemoteConfigs: [[url: params.ARTIFACT_REPO, credentialsId: params.GIT_CREDS]]
                     ])
                 }
-                
+
                 dir('failed_artifacts') {
                     checkout([
                         $class: 'GitSCM',
