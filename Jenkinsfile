@@ -47,7 +47,7 @@ pipeline {
                 dir('failed_artifacts') {
                     checkout([
                         $class: 'GitSCM',
-                        useHeadIfNotFound: true,
+                        depth: 1,
                         branches: [[name: "*/${params.ARTIFACT_FAILED_BRANCH}"]],
                         userRemoteConfigs: [[url: params.ARTIFACT_REPO, credentialsId: params.GIT_CREDS]]
                     ])
@@ -155,13 +155,15 @@ pipeline {
                     sshagent (credentials: [params.GIT_CREDS]) {
                         sh 'git add . -A'
                         sh 'git commit -m "Failed Build #${BUILD_NUMBER} - DO NOT EVER DEPLOY ME!"'
-                        sh 'git push origin HEAD:${ARTIFACT_FAILED_BRANCH}'
+                        sh 'git push origin HEAD:${params.ARTIFACT_FAILED_BRANCH}'
                         sh 'git gc --aggressive'
                     }
+
+                    GIT_FAILED_ARTIFACT_COMMIT = sh(returnStdout: true, script: "git rev-parse HEAD").trim()
                 }
 
                 if (params.SLACK_CHANNEL) {
-                    slackSend color: '#C51B20', channel: params.SLACK_CHANNEL, message: ":heavy_exclamation_mark: Building *${params.PROJECT_NAME}* has failed! | <${env.BUILD_URL}| Job #${env.BUILD_NUMBER}>"
+                    slackSend color: '#C51B20', channel: params.SLACK_CHANNEL, message: ":heavy_exclamation_mark: Building *${params.PROJECT_NAME}* has failed! | <${env.BUILD_URL}| Job #${env.BUILD_NUMBER}>\n<https://gitlab.creativestyle.pl/creativeshop-build-artifacts/${params.PROJECT_NAME}/commit/${GIT_FAILED_ARTIFACT_COMMIT}| Failed Build>"
                 }
             }
         }
