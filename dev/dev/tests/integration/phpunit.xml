@@ -21,7 +21,7 @@
             <exclude>testsuite/Magento/MemoryUsageTest.php</exclude>
         </testsuite>
         <testsuite name="creativestyle">
-		<directory>../../../vendor/*/*/Test/Integration</directory>
+		    <directory>../../../vendor/creativestyle/*/Test/Integration</directory>
         </testsuite>
     </testsuites>
     <!-- Code coverage filters -->
