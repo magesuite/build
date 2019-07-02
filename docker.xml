@@ -2,7 +2,7 @@
 <project name="creativeshop-frontend" default="tests" basedir=".">
 
     <property name="theme-name" value="creativeshop"/>
-    <property name="docker_container_name" value="magesuite-run-tests-${project}-${env.BUILD_NUMBER}"/>
+    <property name="docker_container_name" value="magesuite-run-tests-${project}${BUILD_NUMBER}"/>
 
     <target name="docker:cleanup" hidden="true">
         <exec command="${docker_bin} rm -f ${docker_container_name}" checkreturn="false"/>
