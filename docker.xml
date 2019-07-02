@@ -11,16 +11,17 @@
     <target name="docker:start" depends="docker:cleanup" hidden="true">
         <echo message="Using docker image '${testing_docker_image}:${testing_docker_tag}'"/>
         <exec command="${docker_bin} run --rm --detach --name ${docker_container_name} --tmpfs /tmp:rw,exec --tmpfs /var/lib/mysql --tmpfs /var/lib/elasticsearch --tmpfs /var/www/html/generated --tmpfs /var/www/html/var --tmpfs /dev/tests/integration/tmp --volume `pwd`:/var/www/html ${testing_docker_image}:${testing_docker_tag}"
-            checkreturn="true" 
-            dir="${project_dir}" 
-            passthru="true"
-            level="error"/>
+              checkreturn="true"
+              dir="${project_dir}"
+              passthru="true"
+              level="error"/>
 
         <echo message="Waiting for container healthcheck to become green..."/>
-        <exec command="sh -c 'while [[ &quot;$(docker inspect --format=&apos;{{json .State.Health.Status}}&apos; ${docker_container_name})&quot; == &apos;&quot;starting&quot;&apos; ]] ; do sleep 0.5s; done'"
-            checkreturn="true" 
-            dir="${project_dir}" 
-            passthru="false"/>
+        <exec command="while [[ &quot;$(docker inspect --format='{{json .State.Health.Status}}' ${docker_container_name})&quot; == '&quot;starting&quot;' ]] ; do sleep 0.5s; done"
+              checkreturn="true"
+              dir="${project_dir}"
+              passthru="true"
+              level="error" />
     </target>
 
     <target name="docker:tests">
