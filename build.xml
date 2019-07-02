@@ -9,6 +9,7 @@
     <property name="testsuite" value="creativestyle"/>
     <property name="build_dir" value="${project_dir}/build"/>
     <property file="${build_dir}/build.properties"/>
+    <property environment="env"/>
 
 
     <includepath classpath="${build_dir}/tasks/" />
