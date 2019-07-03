@@ -38,7 +38,7 @@ pipeline {
                 dir('artifacts') {
                     checkout([
                         $class: 'GitSCM',
-                        depth: 1,
+                        extensions: [[$class: 'CloneOption', depth: 1, noTags: false, reference: '', shallow: true]],
                         branches: [[name: "*/${params.ARTIFACT_BRANCH}"]],
                         userRemoteConfigs: [[url: params.ARTIFACT_REPO, credentialsId: params.GIT_CREDS]]
                     ])
@@ -47,7 +47,7 @@ pipeline {
                 dir('failed_artifacts') {
                     checkout([
                         $class: 'GitSCM',
-                        depth: 1,
+                        extensions: [[$class: 'CloneOption', depth: 1, noTags: false, reference: '', shallow: true]],
                         branches: [[name: "*/${params.ARTIFACT_FAILED_BRANCH}"]],
                         userRemoteConfigs: [[url: params.ARTIFACT_REPO, credentialsId: params.GIT_CREDS]]
                     ])
@@ -70,6 +70,7 @@ pipeline {
                     // Update project base
                     checkout([
                         $class: 'GitSCM',
+                        extensions: [[$class: 'CloneOption', depth: 1, noTags: false, reference: '', shallow: true]],
                         branches: [[name: "*/${params.CREATIVESHOP_BRANCH}"]],
                         userRemoteConfigs: [[url: params.CREATIVESHOP_REPO, credentialsId: params.GIT_CREDS]]
                     ])
