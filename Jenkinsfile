@@ -84,7 +84,7 @@ pipeline {
                 
                 script {
                     // Create workspace dir if not existing
-                    sh '([ -d "workspace"] && mkdir workspace) || true'
+                    sh '([ -d "workspace" ] && mkdir workspace) || true'
                     // Install new project base
                     sh 'rsync -avz creativeshop/ workspace/ --exclude .git --exclude .gitignore'
                     // Copy lockfile from previous build for comparison if exists
