@@ -153,9 +153,17 @@ pipeline {
                     }
                     
                     dir ('artifacts') {
+                        script {
+                            BUILD_COMMIT_MSG="Build #${env.BUILD_NUMBER}"
+
+                            if (params.QUICK_BUILD) {
+                                BUILD_COMMIT_MSG = "[QUICK - TESTS SKIPPED] " + BUILD_COMMIT_MSG + " - Never ever deploy this build as it has not been tested!"
+                            }
+                        }
+
                         sshagent (credentials: [params.GIT_CREDS]) {
                             sh 'git add . -A'
-                            sh 'git commit -m "Build #${BUILD_NUMBER}"'
+                            sh 'git commit -m "${BUILD_COMMIT_MSG}"'
                             sh 'git push origin HEAD:${COMPUTED_ARTIFACT_BRANCH}'
                             sh 'git gc --aggressive'
                         }
