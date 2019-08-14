@@ -10,11 +10,13 @@ pipeline {
         string(name: 'ARTIFACT_REPO', defaultValue: params.ARTIFACT_REPO, description: 'Artifact git repo URL')
         string(name: 'ARTIFACT_BRANCH', defaultValue: params.ARTIFACT_BRANCH ?: 'master', description: 'Artifact repo branch')
         string(name: 'ARTIFACT_FAILED_BRANCH', defaultValue: params.ARTIFACT_FAILED_BRANCH ?: 'failed', description: 'Artifact repo branch for failed builds')
+        string(name: 'ARTIFACT_QUICK_BRANCH', defaultValue: params.ARTIFACT_QUICK_BRANCH ?: 'quick', description: 'Artifact repo branch for quick builds')
         string(name: 'CREATIVESHOP_REPO', defaultValue: params.CREATIVESHOP_REPO ?: 'git@gitlab.creativestyle.pl:m2c/m2c.git', description: 'Project repo URL')
         string(name: 'CREATIVESHOP_BRANCH', defaultValue: params.CREATIVESHOP_BRANCH, description: 'Project repo branch')
         string(name: 'PROJECT_NAME', defaultValue: params.PROJECT_NAME ?: 'creativeshop', description: 'Name of the project')
         string(name: 'SLACK_CHANNEL', defaultValue: params.SLACK_CHANNEL ?: '#m2c', description: 'Slack channel for notifications')
         string(name: 'PHP', defaultValue: params.PHP ?: 'php', description: 'PHP binary')
+        string(name: 'QUICK_BUILD', defaultValue: false, description: 'Skip testing - this build cannot be deployed to prod! Special artifact branch will be used.')
         credentials(name: 'GIT_CREDS', defaultValue: params.GIT_CREDS ?: '1aa37c8c-73f1-4b3c-a2e5-149de20b989c', description: 'Git repo access credentials')
     }
     
@@ -27,6 +29,7 @@ pipeline {
     
     environment {
         BUILD_USER="${buildUser}"
+        SKIP_TESTS="${QUICK_BUILD}"
     }
     
     stages {
@@ -34,7 +37,7 @@ pipeline {
             steps {
                 script {
                     if (params.SLACK_CHANNEL) {
-                        slackSend color: '#2D8BF1', channel: params.SLACK_CHANNEL, message: ":gear: Build of *${params.PROJECT_NAME}* has been started. | <${env.BUILD_URL}| Job #${env.BUILD_NUMBER}> \n :pray: Started by _${BUILD_USER}_"
+                        slackSend color: '#2D8BF1', channel: params.SLACK_CHANNEL, message: ":gear: " + (QUICK_BUILD ? '[QUICK - No tests!] ' : '') + "Build of *${params.PROJECT_NAME}* has been started. | <${env.BUILD_URL}| Job #${env.BUILD_NUMBER}> \n :pray: Started by _${BUILD_USER}_"
                     }
                 }
             }
@@ -42,6 +45,10 @@ pipeline {
         
         stage('Clone current artifacts') {
             steps {
+                if (QUICK_BUILD) {
+                    ARTIFACT_BRANCH = ARTIFACT_QUICK_BRANCH
+                }
+
                 dir('artifacts') {
                     checkout([
                         $class: 'GitSCM',

@@ -46,7 +46,17 @@
     <target name="build">
         <phingcall target="backend:build"/>
         <phingcall target="frontend:build"/>
-        <phingcall target="tests:all"/>
+        <if>
+            <not>
+                <equals arg1="${env.SKIP_TESTS}" arg2="true"/>
+            </not>
+            <then>
+                <phingcall target="tests:all"/>
+            </then>
+            <else>
+                <echo msg="NOTICE: Skipping tests - env var SKIP_TESTS=true"/>
+            </else>
+        </if>
     </target>
 
     <target name="ci-build">
