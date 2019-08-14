@@ -16,7 +16,7 @@ pipeline {
         string(name: 'PROJECT_NAME', defaultValue: params.PROJECT_NAME ?: 'creativeshop', description: 'Name of the project')
         string(name: 'SLACK_CHANNEL', defaultValue: params.SLACK_CHANNEL ?: '#m2c', description: 'Slack channel for notifications')
         string(name: 'PHP', defaultValue: params.PHP ?: 'php', description: 'PHP binary')
-        string(name: 'QUICK_BUILD', defaultValue: false, description: 'Skip testing - this build cannot be deployed to prod! Special artifact branch will be used.')
+        booleanParam(name: 'QUICK_BUILD', defaultValue: false, description: 'Skip testing - this build cannot be deployed to prod! Special artifact branch will be used.')
         credentials(name: 'GIT_CREDS', defaultValue: params.GIT_CREDS ?: '1aa37c8c-73f1-4b3c-a2e5-149de20b989c', description: 'Git repo access credentials')
     }
     
