@@ -163,8 +163,8 @@ pipeline {
 
                         sshagent (credentials: [params.GIT_CREDS]) {
                             sh 'git add . -A'
-                            sh 'git commit -m "${BUILD_COMMIT_MSG}"'
-                            sh 'git push origin HEAD:${COMPUTED_ARTIFACT_BRANCH}'
+                            sh 'git commit -m "' + BUILD_COMMIT_MSG + '"'
+                            sh 'git push origin HEAD:' + COMPUTED_ARTIFACT_BRANCH
                             sh 'git gc --aggressive'
                         }
                     }
