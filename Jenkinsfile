@@ -45,8 +45,10 @@ pipeline {
         
         stage('Clone current artifacts') {
             steps {
-                if (QUICK_BUILD) {
-                    ARTIFACT_BRANCH = ARTIFACT_QUICK_BRANCH
+                script {
+                    if (QUICK_BUILD) {
+                        ARTIFACT_BRANCH = ARTIFACT_QUICK_BRANCH
+                    }
                 }
 
                 dir('artifacts') {
