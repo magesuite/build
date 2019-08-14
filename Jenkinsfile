@@ -47,7 +47,9 @@ pipeline {
             steps {
                 script {
                     if (params.QUICK_BUILD) {
-                        params.ARTIFACT_BRANCH = params.ARTIFACT_QUICK_BRANCH
+                        COMPUTED_ARTIFACT_BRANCH = params.ARTIFACT_QUICK_BRANCH
+                    } else {
+                        COMPUTED_ARTIFACT_BRANCH = params.ARTIFACT_BRANCH;
                     }
                 }
 
@@ -55,7 +57,7 @@ pipeline {
                     checkout([
                         $class: 'GitSCM',
                         extensions: [[$class: 'CloneOption', depth: 1, noTags: false, reference: '', shallow: true]],
-                        branches: [[name: "*/${params.ARTIFACT_BRANCH}"]],
+                        branches: [[name: "*/${COMPUTED_ARTIFACT_BRANCH}"]],
                         userRemoteConfigs: [[url: params.ARTIFACT_REPO, credentialsId: params.GIT_CREDS]]
                     ])
                 }
@@ -154,7 +156,7 @@ pipeline {
                         sshagent (credentials: [params.GIT_CREDS]) {
                             sh 'git add . -A'
                             sh 'git commit -m "Build #${BUILD_NUMBER}"'
-                            sh 'git push origin HEAD:${ARTIFACT_BRANCH}'
+                            sh 'git push origin HEAD:${COMPUTED_ARTIFACT_BRANCH}'
                             sh 'git gc --aggressive'
                         }
                     }
