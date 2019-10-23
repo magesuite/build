@@ -15,7 +15,7 @@ pipeline {
         string(name: 'PROJECT_NAME', defaultValue: params.PROJECT_NAME ?: 'creativeshop', description: 'Name of the project')
         string(name: 'SLACK_CHANNEL', defaultValue: params.SLACK_CHANNEL ?: '#m2c', description: 'Slack channel for notifications')
         string(name: 'PHP', defaultValue: params.PHP ?: 'php', description: 'PHP binary')
-        credentials(name: 'GIT_CREDS', defaultValue: params.GIT_CREDS ?: '1aa37c8c-73f1-4b3c-a2e5-149de20b989c', description: 'Git repo access credentials')
+        credentials(name: 'GIT_CREDS', defaultValue: params.GIT_CREDS ?: 'cs-gitlab-ssh', description: 'Git repo access credentials')
     }
     
     options {
