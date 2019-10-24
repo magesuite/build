@@ -42,9 +42,11 @@
         <!-- Double update so the patches are applied -->
         <composer composer="${composer_bin}" command="update">
             <arg value="--no-interaction"/>
+            <arg value="--no-progress"/>
         </composer>
         <composer composer="${composer_bin}" command="update">
             <arg value="--no-interaction"/>
+            <arg value="--no-progress"/>
         </composer>
         <phingcall target="backend:hacks:install"/>
     </target>
