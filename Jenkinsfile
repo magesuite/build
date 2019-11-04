@@ -30,6 +30,7 @@ pipeline {
     environment {
         BUILD_USER="${buildUser}"
         SKIP_TESTS="${params.QUICK_BUILD}"
+        COMPOSER_MEMORY_LIMIT="3G"
     }
     
     stages {
