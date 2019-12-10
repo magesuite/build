@@ -150,7 +150,7 @@ pipeline {
                     
                     // Sync new artifacts
                     script {
-                        sh "rsync -az --delete --stats workspace/ artifacts/ --exclude '.git'  --exclude 'CHANGELOGS' --exclude '/build/' --exclude '/dev/' --exclude '/pub/media/' --exclude '/vendor/creativestyle/theme-*/**' --exclude '/app/etc/env.php' --exclude '/auth.json' --exclude '/var/**' --exclude '/app/code/Magento/' --exclude '/generated/'"
+                        sh "rsync -az --delete --stats workspace/ artifacts/ --exclude '.git'  --exclude 'CHANGELOGS' --exclude '/build/' --exclude '/dev/' --exclude '/pub/media/' --exclude '/vendor/creativestyle/theme-*/**' --exclude '/app/etc/env.php' --exclude '/auth.json' --exclude '/var/**' --exclude '/app/code/Magento/Test*' --exclude '/generated/'"
                     }
                     
                     dir ('artifacts') {
@@ -177,7 +177,7 @@ pipeline {
     post {
         failure {
             script {
-                sh "rsync -az --delete --stats workspace/ failed_artifacts/ --exclude '.git'  --exclude 'CHANGELOGS' --exclude '/build/' --exclude '/dev/' --exclude '/pub/media/' --exclude '/vendor/creativestyle/theme-*/**' --exclude '/app/etc/env.php' --exclude '/auth.json' --exclude '/var/**' --exclude '/app/code/Magento/' --exclude '/generated/'"
+                sh "rsync -az --delete --stats workspace/ failed_artifacts/ --exclude '.git'  --exclude 'CHANGELOGS' --exclude '/build/' --exclude '/dev/' --exclude '/pub/media/' --exclude '/vendor/creativestyle/theme-*/**' --exclude '/app/etc/env.php' --exclude '/auth.json' --exclude '/var/**' --exclude '/app/code/Magento/Test*' --exclude '/generated/'"
             
                 dir ('failed_artifacts') {
                     sshagent (credentials: [params.GIT_CREDS]) {
