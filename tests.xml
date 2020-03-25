@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="creativeshop-tests" default="tests">
+    <includepath classpath="${build_dir}/tasks/" />
+
+    <taskdef name="clean_database" classname="CleanDatabaseTask" />
+    <taskdef name="clean_elasticsearch" classname="CleanElasticsearchTask" />
+
 
     <target name="check:phpunit" hidden="true">
         <available file="${phpunit.location}" property="phpunit.available"/>
@@ -50,6 +55,35 @@
         </phingcall>
     </target>
 
+    <target name="tests:quick-integration:install-module" hidden="true">
+        <exec command="composer show reach-digital/magento2-test-framework" dir="${project_dir}" outputProperty="is_installed" />
+        <if>
+            <contains string="${is_installed}" substring="not found"/>
+            <then>
+                <echo msg="Installing reach-digital/magento2-test-framework" />
+                <exec command="composer require reach-digital/magento2-test-framework" dir="${project_dir}" passthru="true" />
+            </then>
+        </if>
+    </target>
+
+    <target name="tests:quick-integration:prepare" hidden="true">
+        <copy file="${build_dir}/${envname}/dev/tests/quick-integration/phpunit.xml"
+              tofile="${project_dir}/dev/tests/quick-integration/phpunit.xml"
+              overwrite="true"/>
+        <copy file="${build_dir}/${envname}/dev/tests/integration/etc/install-config-mysql.php"
+              tofile="${project_dir}/dev/tests/quick-integration/etc/install-config-mysql.php"
+              overwrite="true"/>
+        <copy file="${build_dir}/shared/dev/tests/integration/etc/config-global.php"
+              tofile="${project_dir}/dev/tests/quick-integration/etc/config-global.php"
+              overwrite="true"/>
+    </target>
+
+    <target name="tests:quick-integration" depends="tests:quick-integration:install-module, tests:quick-integration:prepare">
+        <phingcall target="tests:run">
+            <property name="phpunit.location" value="${phpunit.location}"/>
+            <property name="phpunit.xml" value="${phpunit.xml.quick-integration}"/>
+        </phingcall>
+    </target>
 
     <target name="tests:functional:prepare" hidden="true">
         <copy file="${build_dir}/shared/dev/tests/functional/phpunit.xml"
@@ -77,6 +111,34 @@
             <property name="phpunit.location" value="${phpunit.functional.location}"/>
             <property name="phpunit.xml" value="${phpunit.xml.functional}"/>
         </phingcall>
+    </target>
+
+    <target name="tests:cleanup" depends="tests:integration:prepare">
+        <echo msg="Removing dev/tests/integration/tmp/ and generated/ contents" />
+        <phingcall target="tests:cleanup:files" />
+
+        <echo msg="Cleaning up database" />
+        <phingcall target="tests:cleanup:database" />
+
+        <echo msg="Cleaning up elasticsearch" />
+        <phingcall target="tests:cleanup:elasticsearch" />
+    </target>
+
+    <target name="tests:cleanup:files" hidden="true">
+        <exec command="rm -rf ${project_dir}/dev/tests/integration/tmp/*" passthru="true" />
+        <exec command="rm -rf ${project_dir}/generated/*" passthru="true" />
+    </target>
+
+    <target name="tests:cleanup:database" depends="tests:integration:prepare" hidden="true">
+        <clean_database configPath="${project_dir}/dev/tests/integration/etc/install-config-mysql.php"
+                        bootstrapPath="${project_dir}/dev/tests/integration/framework/Magento/TestFramework/Bootstrap.php"
+        />
+    </target>
+
+    <target name="tests:cleanup:elasticsearch" depends="tests:integration:prepare" hidden="true">
+        <clean_elasticsearch configPath="${project_dir}/dev/tests/integration/etc/install-config-mysql.php"
+                             bootstrapPath="${project_dir}/dev/tests/integration/framework/Magento/TestFramework/Bootstrap.php"
+        />
     </target>
 
     <target name="tests:run" hidden="true">
