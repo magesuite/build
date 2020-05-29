@@ -74,7 +74,12 @@ class TvNotificationTask extends AbstractRestApiCallTask
 
     public function main()
     {
-        $this->validateParams();
-        $this->request('POST', 'http://tv.creativestyle.pl/fact', json_encode($this->prepareMessage()), false);
+        try {
+            $this->validateParams();
+            $this->request('POST', 'http://tv.creativestyle.pl/fact', json_encode($this->prepareMessage()), false);    
+        }catch(\Exception $e) {
+            echo $e->getMessage();
+        }
+        
     }
 }
