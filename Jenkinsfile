@@ -10,12 +10,14 @@ pipeline {
         string(name: 'ARTIFACT_REPO', defaultValue: params.ARTIFACT_REPO, description: 'Artifact git repo URL')
         string(name: 'ARTIFACT_BRANCH', defaultValue: params.ARTIFACT_BRANCH ?: 'master', description: 'Artifact repo branch')
         string(name: 'ARTIFACT_FAILED_BRANCH', defaultValue: params.ARTIFACT_FAILED_BRANCH ?: 'failed', description: 'Artifact repo branch for failed builds')
+        string(name: 'ARTIFACT_QUICK_BRANCH', defaultValue: params.ARTIFACT_QUICK_BRANCH ?: 'quick', description: 'Artifact repo branch for quick builds')
         string(name: 'CREATIVESHOP_REPO', defaultValue: params.CREATIVESHOP_REPO ?: 'git@gitlab.creativestyle.pl:m2c/m2c.git', description: 'Project repo URL')
         string(name: 'CREATIVESHOP_BRANCH', defaultValue: params.CREATIVESHOP_BRANCH, description: 'Project repo branch')
         string(name: 'PROJECT_NAME', defaultValue: params.PROJECT_NAME ?: 'creativeshop', description: 'Name of the project')
         string(name: 'SLACK_CHANNEL', defaultValue: params.SLACK_CHANNEL ?: '#m2c', description: 'Slack channel for notifications')
         string(name: 'PHP', defaultValue: params.PHP ?: 'php', description: 'PHP binary')
-        credentials(name: 'GIT_CREDS', defaultValue: params.GIT_CREDS ?: 'cs-gitlab-ssh', description: 'Git repo access credentials')
+        booleanParam(name: 'QUICK_BUILD', defaultValue: false, description: 'Skip testing - this build cannot be deployed to prod! Special artifact branch will be used.')
+        credentials(name: 'GIT_CREDS', defaultValue: params.GIT_CREDS ?: '1aa37c8c-73f1-4b3c-a2e5-149de20b989c', description: 'Git repo access credentials')
     }
     
     options {
@@ -27,6 +29,8 @@ pipeline {
     
     environment {
         BUILD_USER="${buildUser}"
+        SKIP_TESTS="${params.QUICK_BUILD}"
+        COMPOSER_MEMORY_LIMIT="3G"
     }
     
     stages {
@@ -34,7 +38,7 @@ pipeline {
             steps {
                 script {
                     if (params.SLACK_CHANNEL) {
-                        slackSend color: '#2D8BF1', channel: params.SLACK_CHANNEL, message: ":gear: Build of *${params.PROJECT_NAME}* has been started. | <${env.BUILD_URL}| Job #${env.BUILD_NUMBER}> \n :pray: Started by _${BUILD_USER}_"
+                        slackSend color: '#2D8BF1', channel: params.SLACK_CHANNEL, message: ":gear: " + (params.QUICK_BUILD ? '[QUICK - No tests!] ' : '') + "Build of *${params.PROJECT_NAME}* has been started. | <${env.BUILD_URL}| Job #${env.BUILD_NUMBER}> \n :pray: Started by _${BUILD_USER}_"
                     }
                 }
             }
@@ -42,11 +46,19 @@ pipeline {
         
         stage('Clone current artifacts') {
             steps {
+                script {
+                    if (params.QUICK_BUILD) {
+                        COMPUTED_ARTIFACT_BRANCH = params.ARTIFACT_QUICK_BRANCH
+                    } else {
+                        COMPUTED_ARTIFACT_BRANCH = params.ARTIFACT_BRANCH;
+                    }
+                }
+
                 dir('artifacts') {
                     checkout([
                         $class: 'GitSCM',
-                        depth: 1,
-                        branches: [[name: "*/${params.ARTIFACT_BRANCH}"]],
+                        extensions: [[$class: 'CloneOption', depth: 1, noTags: false, reference: '', shallow: true]],
+                        branches: [[name: "*/${COMPUTED_ARTIFACT_BRANCH}"]],
                         userRemoteConfigs: [[url: params.ARTIFACT_REPO, credentialsId: params.GIT_CREDS]]
                     ])
                 }
@@ -54,7 +66,7 @@ pipeline {
                 dir('failed_artifacts') {
                     checkout([
                         $class: 'GitSCM',
-                        depth: 1,
+                        extensions: [[$class: 'CloneOption', depth: 1, noTags: false, reference: '', shallow: true]],
                         branches: [[name: "*/${params.ARTIFACT_FAILED_BRANCH}"]],
                         userRemoteConfigs: [[url: params.ARTIFACT_REPO, credentialsId: params.GIT_CREDS]]
                     ])
@@ -77,6 +89,7 @@ pipeline {
                     // Update project base
                     checkout([
                         $class: 'GitSCM',
+                        extensions: [[$class: 'CloneOption', depth: 1, noTags: false, reference: '', shallow: true]],
                         branches: [[name: "*/${params.CREATIVESHOP_BRANCH}"]],
                         userRemoteConfigs: [[url: params.CREATIVESHOP_REPO, credentialsId: params.GIT_CREDS]]
                     ])
@@ -141,10 +154,18 @@ pipeline {
                     }
                     
                     dir ('artifacts') {
+                        script {
+                            BUILD_COMMIT_MSG="Build #${env.BUILD_NUMBER}"
+
+                            if (params.QUICK_BUILD) {
+                                BUILD_COMMIT_MSG = "[QUICK - TESTS SKIPPED] " + BUILD_COMMIT_MSG + " - Never ever deploy this build as it has not been tested!"
+                            }
+                        }
+
                         sshagent (credentials: [params.GIT_CREDS]) {
                             sh 'git add . -A'
-                            sh 'git commit -m "Build #${BUILD_NUMBER}"'
-                            sh 'git push origin HEAD:${ARTIFACT_BRANCH}'
+                            sh 'git commit -m "' + BUILD_COMMIT_MSG + '"'
+                            sh 'git push origin HEAD:' + COMPUTED_ARTIFACT_BRANCH
                             sh 'git gc --aggressive'
                         }
                     }

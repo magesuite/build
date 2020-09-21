@@ -6,14 +6,16 @@
 
 return [
     'db-host' => '127.0.0.1',
-    'db-user' => 'root',
-    'db-password' => '',
+    'db-user' => 'magento2',
+    'db-password' => 'magento2',
     'db-name' => 'magento2_integration_tests',
     'db-prefix' => '',
+
     'backend-frontname' => 'backend',
     'es-hosts' => '127.0.0.1:9200',
     'base-url' => 'http://localhost/',
     'static-on-demand-production' => 1,
+
     'admin-user' => \Magento\TestFramework\Bootstrap::ADMIN_NAME,
     'admin-password' => \Magento\TestFramework\Bootstrap::ADMIN_PASSWORD,
     'admin-email' => \Magento\TestFramework\Bootstrap::ADMIN_EMAIL,
