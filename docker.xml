@@ -29,7 +29,7 @@
             <try>
                 <phingcall target="docker:start"/>
 
-                <exec command="${docker_bin} exec --tty --user &quot;$(id -u):$(id -g)&quot; ${docker_container_name} /usr/bin/mgs-run-tests ${envname} ${testsuite}"
+                <exec command="${docker_bin} exec --tty ${docker_container_name} /usr/bin/mgs-run-tests ${envname} ${testsuite} $(id -u) $(id -g)"
                     checkreturn="true" dir="${project_dir}" 
                     passthru="true" 
                     level="error"/>
