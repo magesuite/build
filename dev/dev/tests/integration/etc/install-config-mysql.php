@@ -10,7 +10,7 @@ return [
     'db-password' => 'vagrant',
     'db-name' => 'magento2_integration_tests',
     'db-prefix' => '',
-    'es-hosts' => '127.0.0.1:9201',
+    'es-hosts' => '127.0.0.1:9200',
     'backend-frontname' => 'backend',
     'base-url' => 'http://localhost/',
     'admin-user' => \Magento\TestFramework\Bootstrap::ADMIN_NAME,
