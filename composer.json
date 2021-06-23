@@ -1,6 +1,6 @@
 {
-    "name": "creativestyle/creativeshop-build",
-    "description": "Build automation for creativeshop",
+    "name": "creativestyle/magesuite-build",
+    "description": "Build automation for MageSuite",
     "minimum-stability": "dev",
     "type": "magento2-component",
     "require": {},
