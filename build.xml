@@ -14,7 +14,6 @@
 
     <includepath classpath="${build_dir}/tasks/" />
     <taskdef name="slack" classname="SlackNotificationTask" />
-    <taskdef name="tv" classname="TvNotificationTask" />
 
     <import file="${build_dir}/tests.xml"/>
     <import file="${build_dir}/backend.xml"/>
@@ -60,7 +59,6 @@
     </target>
 
     <target name="ci-build">
-        <tv message="&lt;strong&gt;${project}&lt;/strong&gt; build started!" type="normal"/>
         <property name="envname" value="ci" override="true"/>
         <warn message="CI build overrides `envname` to value `ci`"/>
         <trycatch property="exception">
@@ -68,11 +66,9 @@
                 <phingcall target="build"/>
             </try>
             <catch>
-                <tv message="&lt;strong&gt;${project}&lt;/strong&gt; build failed!" type="alert" say="en"/>
                 <fail message="${exception}"/>
             </catch>
         </trycatch>
-        <tv message="&lt;strong&gt;${project}&lt;/strong&gt; build succeeded!" type="success"/>
     </target>
 
     <target name="help" hidden="true">
