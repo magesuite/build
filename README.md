@@ -65,5 +65,5 @@ Placeholders should be replaced with:
 In order to run build execute following commands:
 ```bash
 [[ -d "vendor" ]] || composer update
-phing ci-build
+php -d memory_limit=-1 vendor/bin/phing ci-build
 ```
