@@ -48,7 +48,7 @@ It must contain basic configuration that consists of:
 <project name="{{PROJECT_NAME}}" default="help" basedir="." description="{{PROJECT_NAME}} build definition">
     <import file="build/build.xml"/>
 
-    <property name="themes" value="creativeshop,{{PROJECT_THEME_NAME}}"/>
+    <property name="themes" value="creativeshop,{{PROJECT_THEMES_NAMES}}"/>
     <property name="project" value="{{PROJECT_NAME}}"/>
     <property name="testing_docker_tag" value="php74-es7-mariadb104-stable" override="true"/>
     <property name="testing_docker_image" value="mageops/magento-run-tests" override="true"/>
@@ -58,7 +58,8 @@ It must contain basic configuration that consists of:
 Placeholders should be replaced with:
 
 * `{{PROJECT_NAME}}` - name of a project, example: `toys-shop`
-* `{{PROJEC_THEME_NAME}}` - name of custom theme in `vendor/creativestyle` directory, for `vendor/creativestyle/theme-toys-shop` replace placeholder with `toys-shop` 
+* `{{PROJECT_THEMES_NAMES}}` - comma separated list of names of all custom themes that should be built, contained in `vendor/creativestyle` directory. 
+Name must be provided without `theme-` prefix, for `vendor/creativestyle/theme-toys-shop` placeholder value will become `toys-shop` 
 
 ## Running build
 
