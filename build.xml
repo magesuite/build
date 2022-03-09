@@ -18,6 +18,7 @@
     <import file="${build_dir}/tests.xml"/>
     <import file="${build_dir}/backend.xml"/>
     <import file="${build_dir}/frontend.xml"/>
+    <import file="${build_dir}/content-constructor.xml"/>
     <import file="${build_dir}/docker.xml"/>
 
     <if>
@@ -45,6 +46,7 @@
     <target name="build">
         <phingcall target="backend:build"/>
         <phingcall target="frontend:build"/>
+        <phingcall target="content-constructor:build"/>
         <if>
             <not>
                 <equals arg1="${env.SKIP_TESTS}" arg2="true"/>
