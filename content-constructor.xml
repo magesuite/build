@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="creativeshop-content-constructor" default="tests" basedir=".">
+
+    <target name="content-constructor:build">
+        <echo message="Building Content Constructor..."/>
+
+        <exec dir="${project_dir}/vendor/creativestyle/magesuite-content-constructor-admin"
+            command="yarn --frozen-lockfile"
+            escape="false"
+            passthru="true"
+            checkreturn="true"/>
+
+        <exec dir="${project_dir}/vendor/creativestyle/magesuite-content-constructor-admin"
+            command="yarn build"
+            escape="false"
+            passthru="true"
+            checkreturn="true"/>
+    </target>
+
+</project>
