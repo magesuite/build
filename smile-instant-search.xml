@@ -7,6 +7,7 @@
                 <echo message="Building Smile Instant Search React Component..."/>
 
                 <touch file="${project_dir}/app/etc/config.php" />
+                <mkdir dir="${project_dir}/var/tmp" />
 
                 <exec dir="${project_dir}"
                       command="yarn install"
