@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="creativeshop-smile-instant-search" default="tests" basedir=".">
+    <target name="smile-instant-search:build">
+        <if>
+            <available file='${project_dir}/vendor/smile/magento2-react' type='dir' />
+            <then>
+                <echo message="Building Smile Instant Search React Component..."/>
+
+                <exec dir="${project_dir}"
+                      command="yarn install"
+                      escape="false"
+                      passthru="true"
+                      checkreturn="true"/>
+
+                <exec dir="${project_dir}"
+                      command="yarn build"
+                      escape="false"
+                      passthru="true"
+                      checkreturn="true"/>
+            </then>
+        </if>
+    </target>
+</project>

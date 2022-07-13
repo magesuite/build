@@ -18,6 +18,7 @@
     <import file="${build_dir}/tests.xml"/>
     <import file="${build_dir}/backend.xml"/>
     <import file="${build_dir}/frontend.xml"/>
+    <import file="${build_dir}/smile-instant-search.xml"/>
     <import file="${build_dir}/content-constructor.xml"/>
     <import file="${build_dir}/docker.xml"/>
 
@@ -47,6 +48,7 @@
         <phingcall target="backend:build"/>
         <phingcall target="frontend:build"/>
         <phingcall target="content-constructor:build"/>
+        <phingcall target="smile-instant-search:build"/>
         <if>
             <not>
                 <equals arg1="${env.SKIP_TESTS}" arg2="true"/>
