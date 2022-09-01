@@ -41,11 +41,16 @@ class CleanDatabaseTask extends Task
 
         $connection->prepare('SET foreign_key_checks = 0')->execute();
 
-        $statement = $connection->prepare('SHOW TABLES');
+        $statement = $connection->prepare('SHOW FULL TABLES');
         $statement->execute();
 
         foreach($statement->fetchAll() as $table) {
             $tableName = $table[0];
+            $tableType = $table[1];
+
+            if($tableType === 'VIEW') {
+                continue;
+            }
 
             $connection->prepare('DROP TABLE ' . $tableName)->execute();
         }
