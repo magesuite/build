@@ -3,6 +3,7 @@
 
     <property name="theme-name" value="creativeshop"/>
     <property name="docker_container_name" value="magesuite-run-tests-${project}${BUILD_NUMBER}"/>
+    <property name="testing_docker_timeout" value="1h"/>
 
     <target name="docker:cleanup" hidden="true">
         <exec command="${docker_bin} rm -f ${docker_container_name}" checkreturn="false"/>
@@ -14,7 +15,7 @@
               passthru="true"
               level="error"/>
 
-        <exec command="${docker_bin} run --rm --detach --name ${docker_container_name} --tmpfs /tmp:rw,exec,mode=1777 --tmpfs /var/lib/mysql:rw,mode=777 --tmpfs /var/lib/elasticsearch:rw,mode=777 --tmpfs /var/www/html/generated:rw,mode=777 --tmpfs /var/www/html/var:rw,mode=777 --tmpfs /dev/tests/integration/tmp:rw,mode=777 --volume `pwd`:/var/www/html -e ES_JAVA_OPTS='-Xms256m -Xmx256m' ${testing_docker_image}:${testing_docker_tag}"
+        <exec command="${docker_bin} run --rm --detach --name ${docker_container_name} --tmpfs /tmp:rw,exec,mode=1777 --tmpfs /var/lib/mysql:rw,mode=777 --tmpfs /var/lib/elasticsearch:rw,mode=777 --tmpfs /var/www/html/generated:rw,mode=777 --tmpfs /var/www/html/var:rw,mode=777 --tmpfs /dev/tests/integration/tmp:rw,mode=777 --volume `pwd`:/var/www/html -e ES_JAVA_OPTS='-Xms256m -Xmx256m' -e CONTAINER_TIMEOUT='${testing_docker_timeout}' ${testing_docker_image}:${testing_docker_tag}"
               checkreturn="true"
               dir="${project_dir}"
               passthru="true"
