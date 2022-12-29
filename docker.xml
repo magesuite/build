@@ -3,7 +3,7 @@
 
     <property name="theme-name" value="creativeshop"/>
     <property name="docker_container_name" value="magesuite-run-tests-${project}${BUILD_NUMBER}"/>
-    <property name="testing_docker_timeout" value="1h"/>
+    <property name="testing_docker_timeout" value="2h"/>
 
     <target name="docker:cleanup" hidden="true">
         <exec command="${docker_bin} rm -f ${docker_container_name}" checkreturn="false"/>
