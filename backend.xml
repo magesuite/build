@@ -39,16 +39,23 @@
     </target>
 
     <target name="backend:build" depends="backend:decrypt-auth">
-        <!-- Double update so the patches are applied -->
-        <composer composer="${composer_bin}" command="update">
-            <arg value="--no-interaction"/>
-            <arg value="--no-progress"/>
-        </composer>
-        <composer composer="${composer_bin}" command="update">
-            <arg value="--no-interaction"/>
-            <arg value="--no-progress"/>
-        </composer>
+        <if>
+            <ispropertytrue property="composer_verbose" />
+            <then>
+                <composer composer="${composer_bin}" command="update">
+                    <arg value="--no-interaction"/>
+                    <arg value="--no-progress"/>
+                    <arg value="-vvv"/>
+                </composer>
+            </then>
+            <else>
+                <composer composer="${composer_bin}" command="update">
+                    <arg value="--no-interaction"/>
+                    <arg value="--no-progress"/>
+                </composer>
+            </else>
+        </if>
+
         <phingcall target="backend:hacks:install"/>
     </target>
-
 </project>
