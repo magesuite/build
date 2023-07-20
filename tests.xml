@@ -143,29 +143,30 @@
 
     <target name="tests:run" hidden="true">
         <echo message="Executing tests with environment '${envname}'"/>
+
         <if>
             <isset property="folder"/>
             <then>
-                <exec command="${phpunit.location} -c ${phpunit.xml} ${project_dir}/${folder}"
+                <exec command="${phpunit.location} -c ${phpunit.xml} ${project_dir}/${folder} ${phpunitOptions}"
                       passthru="true"
                       checkreturn="true" level="error"/>
             </then>
             <elseif>
                 <isset property="testsuite"/>
                 <then>
-                    <exec command="${phpunit.location} -c ${phpunit.xml} --testsuite=${testsuite}"
+                    <exec command="${phpunit.location} -c ${phpunit.xml} --testsuite=${testsuite} ${phpunitOptions}"
                           passthru="true" checkreturn="true" level="error"/>
                 </then>
             </elseif>
             <elseif>
                 <isset property="filter"/>
                 <then>
-                    <exec command="${phpunit.location} -c $${phpunit.xml} --filter=${filter}"
+                    <exec command="${phpunit.location} -c $${phpunit.xml} --filter=${filter} ${phpunitOptions}"
                           passthru="true" checkreturn="true" level="error"/>
                 </then>
             </elseif>
             <else>
-                <exec command="${phpunit.location} -c ${phpunit.xml}"
+                <exec command="${phpunit.location} -c ${phpunit.xml} ${phpunitOptions}"
                       passthru="true" checkreturn="true" level="error"/>
             </else>
         </if>
