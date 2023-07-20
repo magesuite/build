@@ -153,7 +153,7 @@
             <elseif>
                 <isset property="testsuite"/>
                 <then>
-                    <exec command="${phpunit.location} -c ${phpunit.xml} --testsuite=${testsuite} ${phpunit.flags}"
+                    <exec command="${phpunit.location} -c ${phpunit.xml} --testsuite=${testsuite}"
                           passthru="true" checkreturn="true" level="error"/>
                 </then>
             </elseif>
