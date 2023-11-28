@@ -6,6 +6,13 @@
             <then>
                 <echo message="Building Smile Instant Search React Component..."/>
 
+                <if>
+                    <available file="${project_dir}/app/etc/config.php" type="file" />
+                    <then>
+                        <move file="${project_dir}/app/etc/config.php" tofile="${project_dir}/app/etc/config_to_restore.php" />
+                    </then>
+                </if>
+
                 <touch file="${project_dir}/app/etc/config.php" />
                 <mkdir dir="${project_dir}/var/tmp" />
 
@@ -22,6 +29,13 @@
                       checkreturn="true"/>
 
                 <delete file="${project_dir}/app/etc/config.php" />
+
+                <if>
+                    <available file="${project_dir}/app/etc/config_to_restore.php" type="file" />
+                    <then>
+                        <move file="${project_dir}/app/etc/config_to_restore.php" tofile="${project_dir}/app/etc/config.php" />
+                    </then>
+                </if>
             </then>
         </if>
     </target>
