@@ -39,7 +39,7 @@ abstract class AbstractRestApiCallTask extends Task
         }
 
         if ($responseCode >= 400) {
-            $message = "Error calling ${method} ${url}, got ${responseCode} response with body: ${responsePayload}";
+            $message = "Error calling {$method} {$url}, got {$responseCode} response with body: {$responsePayload}";
 
             if ($failOnErrors) {
                 throw new BuildException($message);
