@@ -5,6 +5,7 @@
 <project name="creativeshop-base" default="help" description="creativeshop base build definition">
     <!-- Warning! The dot will resolve to the directory from which this file was included (phing was run) -->
     <resolvepath propertyName="project_dir" file="."/>
+    <autoloader autoloaderpath="vendor/autoload.php"/>
 
     <property name="testsuite" value="creativestyle"/>
     <property name="build_dir" value="${project_dir}/build"/>
@@ -21,6 +22,7 @@
     <import file="${build_dir}/smile-instant-search.xml"/>
     <import file="${build_dir}/content-constructor.xml"/>
     <import file="${build_dir}/docker.xml"/>
+    <import file="${build_dir}/magento.xml"/>
 
     <if>
         <not>

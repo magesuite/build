@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="creativeshop-magento" default="tests" basedir=".">
+    <target name="magento:build">
+        <if>
+            <available file="${project_dir}/app/etc/config.php" type="file" />
+            <then>
+                <move file="${project_dir}/app/etc/config.php" tofile="${project_dir}/app/etc/config_to_restore.php" />
+            </then>
+        </if>
+
+        <echo message="Running module:enable..."/>
+
+        <exec executable="${docker_bin}" checkreturn="true" dir="${project_dir}" passthru="true" level="error">
+            <arg line="exec --tty ${docker_container_name} /var/www/html/bin/magento module:enable --all --quiet"/>
+        </exec>
+
+        <echo message="Running setup:di:compile..."/>
+
+        <exec executable="${docker_bin}" checkreturn="true" dir="${project_dir}" passthru="true" level="error">
+            <arg line="exec --tty ${docker_container_name} /var/www/html/bin/magento setup:di:compile --quiet"/>
+        </exec>
+
+        <delete file="${project_dir}/app/etc/config.php" />
+
+        <if>
+            <available file="${project_dir}/app/etc/config_to_restore.php" type="file" />
+            <then>
+                <move file="${project_dir}/app/etc/config_to_restore.php" tofile="${project_dir}/app/etc/config.php" />
+            </then>
+        </if>
+    </target>
+</project>

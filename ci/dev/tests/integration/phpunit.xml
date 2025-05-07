@@ -1,9 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/4.1/phpunit.xsd"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.0/phpunit.xsd"
          colors="true"
+         columns="max"
+         beStrictAboutTestsThatDoNotTestAnything="false"
          bootstrap="./framework/bootstrap.php"
->
+         stderr="true">
+    <source>
+        <include>
+            <directory suffix=".php">../../../../app/code/Magento</directory>
+            <directory suffix=".php">../../../../lib/internal/Magento</directory>
+        </include>
+        <exclude>
+            <directory>../../../../app/code/*/*/Test</directory>
+            <directory>../../../../lib/internal/*/*/Test</directory>
+            <directory>../../../../lib/internal/*/*/*/Test</directory>
+            <directory>../../../../setup/src/*/*/Test</directory>
+        </exclude>
+    </source>
     <testsuites>
         <testsuite name="Memory Usage Tests">
             <file>testsuite/Magento/MemoryUsageTest.php</file>
@@ -16,20 +30,7 @@
             <directory>../../../vendor/creativestyle/*/Test/Integration</directory>
             <exclude>../../../vendor/dotmailer/dotmailer-magento2-extension/*</exclude>
         </testsuite>
-
     </testsuites>
-    <filter>
-        <whitelist addUncoveredFilesFromWhiteList="true">
-            <directory suffix=".php">../../../../app/code/Magento</directory>
-            <directory suffix=".php">../../../../lib/internal/Magento</directory>
-            <exclude>
-                <directory>../../../../app/code/*/*/Test</directory>
-                <directory>../../../../lib/internal/*/*/Test</directory>
-                <directory>../../../../lib/internal/*/*/*/Test</directory>
-                <directory>../../../../setup/src/*/*/Test</directory>
-            </exclude>
-        </whitelist>
-    </filter>
     <php>
         <includePath>.</includePath>
         <includePath>testsuite</includePath>
@@ -41,12 +42,12 @@
         <const name="TESTS_GLOBAL_CONFIG_DIR" value="../../../app/etc"/>
         <const name="TESTS_POST_INSTALL_SETUP_COMMAND_CONFIG_FILE" value="etc/post-install-setup-command-config.php"/>
         <const name="TESTS_MEM_LEAK_LIMIT" value=""/>
-        <const name="TESTS_CLEANUP" value="enabled"/>
+        <const name="TESTS_EXTRA_VERBOSE_LOG" value="1"/>
+        <const name="TESTS_CLEANUP" value="disabled"/>
         <const name="TESTS_MAGENTO_MODE" value="developer"/>
         <const name="TESTS_ERROR_LOG_LISTENER_LEVEL" value="-1"/>
     </php>
-    <listeners>
-        <listener class="Magento\TestFramework\Event\PhpUnit"/>
-        <listener class="Magento\TestFramework\ErrorLog\Listener"/>
-    </listeners>
+    <extensions>
+        <bootstrap class="Magento\TestFramework\Event\Subscribers"/>
+    </extensions>
 </phpunit>

@@ -43,6 +43,9 @@
         <copy file="${build_dir}/${envname}/dev/tests/integration/etc/install-config-mysql.php"
               tofile="${project_dir}/dev/tests/integration/etc/install-config-mysql.php"
               overwrite="true"/>
+        <copy file="${build_dir}/${envname}/dev/tests/integration/etc/post-install-setup-command-config.php"
+              tofile="${project_dir}/dev/tests/integration/etc/post-install-setup-command-config.php"
+              overwrite="true"/>
         <copy file="${build_dir}/shared/dev/tests/integration/etc/config-global.php"
               tofile="${project_dir}/dev/tests/integration/etc/config-global.php"
               overwrite="true"/>
@@ -56,12 +59,18 @@
     </target>
 
     <target name="tests:quick-integration:install-module" hidden="true">
-        <exec command="composer show reach-digital/magento2-test-framework" dir="${project_dir}" outputProperty="is_installed" />
+        <exec executable="composer" dir="${project_dir}" outputProperty="is_installed">
+            <arg value="show"/>
+            <arg value="reach-digital/magento2-test-framework"/>
+        </exec>
         <if>
             <contains string="${is_installed}" substring="not found"/>
             <then>
                 <echo msg="Installing reach-digital/magento2-test-framework" />
-                <exec command="composer require reach-digital/magento2-test-framework" dir="${project_dir}" passthru="true" />
+                <exec executable="composer" dir="${project_dir}" passthru="true">
+                    <arg value="require"/>
+                    <arg value="reach-digital/magento2-test-framework"/>
+                </exec>
             </then>
         </if>
     </target>
@@ -95,15 +104,23 @@
     </target>
 
     <target name="tests:functional:composer" hidden="true">
-        <exec command="php ${build_dir}/shared/dev/tests/functional/add_namespace.php ${project_dir}/dev/tests/functional/composer.json"
-              passthru="true"/>
-        <exec command="composer du" dir="${tests.functional.location}" passthru="true"/>
-        <exec command="php ${build_dir}/shared/dev/tests/functional/symlink_tests.php" passthru="true"/>
+        <exec executable="php" passthru="true">
+            <arg value="${build_dir}/shared/dev/tests/functional/add_namespace.php"/>
+            <arg value="${project_dir}/dev/tests/functional/composer.json"/>
+        </exec>
+        <exec executable="composer" dir="${tests.functional.location}" passthru="true">
+            <arg value="du"/>
+        </exec>
+        <exec executable="php" passthru="true">
+            <arg value="${build_dir}/shared/dev/tests/functional/symlink_tests.php"/>
+        </exec>
     </target>
 
     <target name="tests:functional:generate" hidden="true"
             depends="tests:functional:check, tests:functional:prepare, tests:functional:composer">
-        <exec command="php utils/generate.php" dir="${tests.functional.location}" passthru="true"/>
+        <exec executable="php" dir="${tests.functional.location}" passthru="true">
+            <arg value="utils/generate.php"/>
+        </exec>
     </target>
 
     <target name="tests:functional" depends="tests:functional:generate">
@@ -115,18 +132,24 @@
 
     <target name="tests:cleanup" depends="tests:integration:prepare">
         <echo msg="Removing dev/tests/integration/tmp/ and generated/ contents" />
-        <phingcall target="tests:cleanup:files" />
+        <phingcall target="tests:cleanup:files"/>
 
         <echo msg="Cleaning up database" />
-        <phingcall target="tests:cleanup:database" />
+        <phingcall target="tests:cleanup:database"/>
 
         <echo msg="Cleaning up elasticsearch" />
-        <phingcall target="tests:cleanup:elasticsearch" />
+        <phingcall target="tests:cleanup:elasticsearch"/>
     </target>
 
     <target name="tests:cleanup:files" hidden="true">
-        <exec command="rm -rf ${project_dir}/dev/tests/integration/tmp/*" passthru="true" />
-        <exec command="rm -rf ${project_dir}/generated/*" passthru="true" />
+        <exec executable="rm" passthru="true">
+            <arg value="-rf"/>
+            <arg value="${project_dir}/dev/tests/integration/tmp/*"/>
+        </exec>
+        <exec executable="rm" passthru="true">
+            <arg value="-rf"/>
+            <arg value="${project_dir}/generated/*"/>
+        </exec>
     </target>
 
     <target name="tests:cleanup:database" depends="tests:integration:prepare" hidden="true">
@@ -147,27 +170,37 @@
         <if>
             <isset property="folder"/>
             <then>
-                <exec command="${phpunit.location} -c ${phpunit.xml} ${project_dir}/${folder} ${phpunitOptions}"
-                      passthru="true"
-                      checkreturn="true" level="error"/>
+                <exec executable="${phpunit.location}" passthru="true" checkreturn="true" level="error">
+                    <arg line="-c ${phpunit.xml}"/>
+                    <arg line="${project_dir}/${folder}"/>
+                    <arg line="${phpunitOptions}"/>
+                </exec>
             </then>
             <elseif>
                 <isset property="testsuite"/>
                 <then>
-                    <exec command="${phpunit.location} -c ${phpunit.xml} --testsuite=${testsuite} ${phpunitOptions}"
-                          passthru="true" checkreturn="true" level="error"/>
+                    <exec executable="${phpunit.location}" passthru="true" checkreturn="true" level="error">
+                        <arg line="-c ${phpunit.xml}"/>
+                        <arg line="--testsuite=${testsuite}"/>
+                        <arg line="${phpunitOptions}"/>
+                    </exec>
                 </then>
             </elseif>
             <elseif>
                 <isset property="filter"/>
                 <then>
-                    <exec command="${phpunit.location} -c $${phpunit.xml} --filter=${filter} ${phpunitOptions}"
-                          passthru="true" checkreturn="true" level="error"/>
+                    <exec executable="${phpunit.location}" passthru="true" checkreturn="true" level="error">
+                        <arg line="-c ${phpunit.xml}"/>
+                        <arg line="--filter=${filter}"/>
+                        <arg line="${phpunitOptions}"/>
+                    </exec>
                 </then>
             </elseif>
             <else>
-                <exec command="${phpunit.location} -c ${phpunit.xml} ${phpunitOptions}"
-                      passthru="true" checkreturn="true" level="error"/>
+                <exec executable="${phpunit.location}" passthru="true" checkreturn="true" level="error">
+                    <arg line="-c ${phpunit.xml}"/>
+                    <arg line="${phpunitOptions}"/>
+                </exec>
             </else>
         </if>
     </target>

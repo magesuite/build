@@ -1,8 +1,8 @@
 <?php
 
-require_once "phing/Task.php";
+declare(strict_types=1);
 
-class CleanDatabaseTask extends Task
+class CleanDatabaseTask extends \Phing\Task
 {
     /**
      * @var string

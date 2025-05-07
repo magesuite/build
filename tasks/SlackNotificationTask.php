@@ -1,6 +1,6 @@
 <?php
 
-require_once 'AbstractRestApiCallTask.php';
+declare(strict_types=1);
 
 class SlackNotificationTask extends AbstractRestApiCallTask
 {

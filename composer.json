@@ -3,7 +3,10 @@
     "description": "Build automation for MageSuite",
     "minimum-stability": "dev",
     "type": "magento2-component",
-    "require": {},
+    "require-dev": {
+        "phing/phing": "^3.0.0",
+        "phpunit/phpunit": "^10.5"
+    },
     "extra": {
         "map": [
             [
