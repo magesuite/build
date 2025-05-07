@@ -1,10 +1,10 @@
 <?php
 
-require_once "phing/Task.php";
+declare(strict_types=1);
 
-abstract class AbstractRestApiCallTask extends Task
+abstract class AbstractRestApiCallTask extends \Phing\Task
 {
-    protected function request(string $method, string $url, string $payload, bool $failOnErrors = true, string $contentType = 'application/json', callable $handleResponse = null)
+    protected function request(string $method, string $url, string $payload, bool $failOnErrors = true, string $contentType = 'application/json', ?callable $handleResponse = null)
     {
         $curl = curl_init();
 

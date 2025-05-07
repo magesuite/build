@@ -16,17 +16,13 @@
                 <touch file="${project_dir}/app/etc/config.php" />
                 <mkdir dir="${project_dir}/var/tmp" />
 
-                <exec dir="${project_dir}"
-                      command="yarn install"
-                      escape="false"
-                      passthru="true"
-                      checkreturn="true"/>
+                <exec dir="${project_dir}" executable="yarn" escape="false" passthru="true" checkreturn="true">
+                    <arg value="install"/>
+                </exec>
 
-                <exec dir="${project_dir}"
-                      command="yarn build"
-                      escape="false"
-                      passthru="true"
-                      checkreturn="true"/>
+                <exec dir="${project_dir}" executable="yarn" escape="false" passthru="true" checkreturn="true">
+                    <arg value="build"/>
+                </exec>
 
                 <delete file="${project_dir}/app/etc/config.php" />
 

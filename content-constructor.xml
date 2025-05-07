@@ -5,16 +5,13 @@
         <echo message="Building Content Constructor..."/>
 
         <exec dir="${project_dir}/vendor/creativestyle/magesuite-content-constructor-admin"
-            command="yarn --frozen-lockfile"
-            escape="false"
-            passthru="true"
-            checkreturn="true"/>
+            executable="yarn" escape="false" passthru="true" checkreturn="true">
+            <arg value="--frozen-lockfile"/>
+        </exec>
 
         <exec dir="${project_dir}/vendor/creativestyle/magesuite-content-constructor-admin"
-            command="yarn build"
-            escape="false"
-            passthru="true"
-            checkreturn="true"/>
+            executable="yarn" escape="false" passthru="true" checkreturn="true">
+            <arg value="build"/>
+        </exec>
     </target>
-
 </project>
