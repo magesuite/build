@@ -18,7 +18,7 @@
 
         <exec executable="${docker_bin}" passthru="true" level="error">
             <arg value="pull"/>
-            <arg value="'${testing_docker_image}:${testing_docker_tag}'"/>
+            <arg value="${testing_docker_image}:${testing_docker_tag}"/>
         </exec>
 
         <exec executable="${docker_bin}" checkreturn="true" dir="${project_dir}" passthru="true" level="error">
