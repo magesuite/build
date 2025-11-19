@@ -3,6 +3,9 @@
     "description": "Build automation for MageSuite",
     "minimum-stability": "dev",
     "type": "magento2-component",
+    "require": {
+        "creativestyle/magesuite-build-composer-plugin": "^1.0.0"
+    },
     "require-dev": {
         "phing/phing": "^3.0.0",
         "phpunit/phpunit": "^10.5"
