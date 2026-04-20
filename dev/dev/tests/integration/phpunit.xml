@@ -48,5 +48,8 @@
     </php>
     <extensions>
         <bootstrap class="Magento\TestFramework\Event\Subscribers"/>
+        <bootstrap class="Magento\TestFramework\Event\MemoryUsageMonitor">
+            <parameter name="enabled" value="@memory.profiler.enabled@"/>
+        </bootstrap>
     </extensions>
 </phpunit>
