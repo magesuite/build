@@ -4,6 +4,7 @@
 
     <taskdef name="clean_database" classname="CleanDatabaseTask" />
     <taskdef name="clean_elasticsearch" classname="CleanElasticsearchTask" />
+    <taskdef name="isolated_test_runner" classname="IsolatedTestRunnerTask" />
 
 
     <target name="check:phpunit" hidden="true">
@@ -39,7 +40,13 @@
     <target name="tests:integration:prepare" hidden="true">
         <copy file="${build_dir}/${envname}/dev/tests/integration/phpunit.xml"
               tofile="${project_dir}/dev/tests/integration/phpunit.xml"
-              overwrite="true"/>
+              overwrite="true">
+            <filterchain>
+                <replacetokens begintoken="@" endtoken="@">
+                    <token key="memory.profiler.enabled" value="${memory.profiler.enabled}"/>
+                </replacetokens>
+            </filterchain>
+        </copy>
         <copy file="${build_dir}/${envname}/dev/tests/integration/etc/install-config-mysql.php"
               tofile="${project_dir}/dev/tests/integration/etc/install-config-mysql.php"
               overwrite="true"/>
@@ -49,49 +56,58 @@
         <copy file="${build_dir}/shared/dev/tests/integration/etc/config-global.php"
               tofile="${project_dir}/dev/tests/integration/etc/config-global.php"
               overwrite="true"/>
+        <copy todir="${project_dir}/dev/tests/integration/framework/Magento/TestFramework/Event"
+              overwrite="true">
+            <fileset dir="${build_dir}/${envname}/dev/tests/integration/framework/Magento/TestFramework/Event">
+                <include name="MemoryUsageMonitor.php"/>
+                <include name="MemoryUsageAfterTestSubscriber.php"/>
+                <include name="MemoryUsageSummarySubscriber.php"/>
+            </fileset>
+        </copy>
     </target>
 
     <target name="tests:integration" depends="tests:integration:prepare, tests:integration:check">
-        <phingcall target="tests:run">
-            <property name="phpunit.location" value="${phpunit.location}"/>
-            <property name="phpunit.xml" value="${phpunit.xml.integration}"/>
-        </phingcall>
-    </target>
-
-    <target name="tests:quick-integration:install-module" hidden="true">
-        <exec executable="composer" dir="${project_dir}" outputProperty="is_installed">
-            <arg value="show"/>
-            <arg value="reach-digital/magento2-test-framework"/>
-        </exec>
         <if>
-            <contains string="${is_installed}" substring="not found"/>
+            <isset property="filter"/>
             <then>
-                <echo msg="Installing reach-digital/magento2-test-framework" />
-                <exec executable="composer" dir="${project_dir}" passthru="true">
-                    <arg value="require"/>
-                    <arg value="reach-digital/magento2-test-framework"/>
-                </exec>
+                <property name="phpunitOptions" value="${phpunitOptions} --filter=${filter}" override="true"/>
             </then>
         </if>
-    </target>
+        <if>
+            <isset property="folder"/>
+            <then>
+                <isolated_test_runner
+                    phpunitLocation="${phpunit.location}"
+                    phpunitXml="${phpunit.xml.integration}"
+                    folder="${project_dir}/${folder}"
+                    batchSize="${batchSize}"
+                    phpunitOptions="${phpunitOptions}"
 
-    <target name="tests:quick-integration:prepare" hidden="true">
-        <copy file="${build_dir}/${envname}/dev/tests/quick-integration/phpunit.xml"
-              tofile="${project_dir}/dev/tests/quick-integration/phpunit.xml"
-              overwrite="true"/>
-        <copy file="${build_dir}/${envname}/dev/tests/integration/etc/install-config-mysql.php"
-              tofile="${project_dir}/dev/tests/quick-integration/etc/install-config-mysql.php"
-              overwrite="true"/>
-        <copy file="${build_dir}/shared/dev/tests/integration/etc/config-global.php"
-              tofile="${project_dir}/dev/tests/quick-integration/etc/config-global.php"
-              overwrite="true"/>
-    </target>
+                />
+            </then>
+            <elseif>
+                <isset property="filter"/>
+                <then>
+                    <isolated_test_runner
+                            phpunitLocation="${phpunit.location}"
+                            phpunitXml="${phpunit.xml.integration}"
+                            batchSize="${batchSize}"
+                            phpunitOptions="${phpunitOptions}"
+                    />
+                </then>
+            </elseif>
+            <else>
+                <property name="testsuite" value="creativestyle" override="false"/>
+                <isolated_test_runner
+                    phpunitLocation="${phpunit.location}"
+                    phpunitXml="${phpunit.xml.integration}"
+                    testsuite="${testsuite}"
+                    batchSize="${batchSize}"
+                    phpunitOptions="${phpunitOptions}"
 
-    <target name="tests:quick-integration" depends="tests:quick-integration:install-module, tests:quick-integration:prepare">
-        <phingcall target="tests:run">
-            <property name="phpunit.location" value="${phpunit.location}"/>
-            <property name="phpunit.xml" value="${phpunit.xml.quick-integration}"/>
-        </phingcall>
+                />
+            </else>
+        </if>
     </target>
 
     <target name="tests:functional:prepare" hidden="true">
@@ -171,6 +187,7 @@
             <isset property="folder"/>
             <then>
                 <exec executable="${phpunit.location}" passthru="true" checkreturn="true" level="error">
+
                     <arg line="-c ${phpunit.xml}"/>
                     <arg line="${project_dir}/${folder}"/>
                     <arg line="${phpunitOptions}"/>
@@ -180,6 +197,7 @@
                 <isset property="testsuite"/>
                 <then>
                     <exec executable="${phpunit.location}" passthru="true" checkreturn="true" level="error">
+
                         <arg line="-c ${phpunit.xml}"/>
                         <arg line="--testsuite=${testsuite}"/>
                         <arg line="${phpunitOptions}"/>
@@ -190,6 +208,7 @@
                 <isset property="filter"/>
                 <then>
                     <exec executable="${phpunit.location}" passthru="true" checkreturn="true" level="error">
+
                         <arg line="-c ${phpunit.xml}"/>
                         <arg line="--filter=${filter}"/>
                         <arg line="${phpunitOptions}"/>
@@ -198,6 +217,7 @@
             </elseif>
             <else>
                 <exec executable="${phpunit.location}" passthru="true" checkreturn="true" level="error">
+
                     <arg line="-c ${phpunit.xml}"/>
                     <arg line="${phpunitOptions}"/>
                 </exec>

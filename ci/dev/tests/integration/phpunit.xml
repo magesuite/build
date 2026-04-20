@@ -28,7 +28,6 @@
         </testsuite>
         <testsuite name="creativestyle">
             <directory>../../../vendor/creativestyle/*/Test/Integration</directory>
-            <exclude>../../../vendor/dotmailer/dotmailer-magento2-extension/*</exclude>
         </testsuite>
     </testsuites>
     <php>
@@ -49,5 +48,8 @@
     </php>
     <extensions>
         <bootstrap class="Magento\TestFramework\Event\Subscribers"/>
+        <bootstrap class="Magento\TestFramework\Event\MemoryUsageMonitor">
+            <parameter name="enabled" value="@memory.profiler.enabled@"/>
+        </bootstrap>
     </extensions>
 </phpunit>
