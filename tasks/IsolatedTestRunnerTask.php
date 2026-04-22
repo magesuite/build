@@ -100,7 +100,13 @@ class IsolatedTestRunnerTask extends \Phing\Task
     protected function findTestFilesInDirectory(string $directory): array
     {
         if (!is_dir($directory)) {
-            throw new \Phing\Exception\BuildException('Folder not found: ' . $directory);
+            $realpath = realpath($directory);
+
+            if (!$realpath) {
+                throw new \Phing\Exception\BuildException('File not found: ' . $directory);
+            }
+
+            return [$realpath];
         }
 
         $files = [];
