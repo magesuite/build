@@ -14,7 +14,6 @@ return [
     'backend-frontname' => 'backend',
     'es-hosts' => '127.0.0.1:9200',
     'base-url' => 'http://localhost/',
-    'static-on-demand-production' => 1,
 
     'admin-user' => \Magento\TestFramework\Bootstrap::ADMIN_NAME,
     'admin-password' => \Magento\TestFramework\Bootstrap::ADMIN_PASSWORD,
