@@ -48,13 +48,13 @@
     </target>
 
     <target name="build">
+        <phingcall target="backend:build"/>
         <if>
         <ispropertytrue property="hyva.enabled"/>
             <then>
                 <phingcall target="hyva:build"/>
             </then>
             <else>
-                <phingcall target="backend:build"/>
                 <phingcall target="frontend:build"/>
                 <phingcall target="content-constructor:build"/>
                 <phingcall target="smile-instant-search:build"/>
