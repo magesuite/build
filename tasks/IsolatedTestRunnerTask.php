@@ -9,6 +9,7 @@ class IsolatedTestRunnerTask extends \Phing\Task
     protected string $folder = '';
     protected string $testsuite = '';
     protected int $batchSize = 10;
+    protected int $batchIndex = 0;
     protected string $phpunitOptions = '';
 
     public function setPhpunitLocation(string $value): void
@@ -36,6 +37,11 @@ class IsolatedTestRunnerTask extends \Phing\Task
         $this->batchSize = $value;
     }
 
+    public function setBatchIndex(int $value): void
+    {
+        $this->batchIndex = $value;
+    }
+
     public function setPhpunitOptions(string $value): void
     {
         $this->phpunitOptions = $value;
@@ -59,6 +65,11 @@ class IsolatedTestRunnerTask extends \Phing\Task
             $this->batchSize
         ));
 
+        if ($this->batchIndex !== 0) {
+            $this->runSingleBatch($batches);
+            return;
+        }
+
         $failedBatches = 0;
 
         foreach ($batches as $index => $batch) {
@@ -80,6 +91,34 @@ class IsolatedTestRunnerTask extends \Phing\Task
         if ($failedBatches > 0) {
             throw new \Phing\Exception\BuildException(
                 sprintf('%d of %d batches failed', $failedBatches, count($batches))
+            );
+        }
+    }
+
+    protected function runSingleBatch(array $batches): void
+    {
+        $totalBatches = count($batches);
+
+        if ($this->batchIndex < 1 || $this->batchIndex > $totalBatches) {
+            throw new \Phing\Exception\BuildException(
+                sprintf('Batch index %d is out of range (1-%d)', $this->batchIndex, $totalBatches)
+            );
+        }
+
+        $batch = $batches[$this->batchIndex - 1];
+
+        $this->log(sprintf(
+            'Running batch %d/%d (%d files)',
+            $this->batchIndex,
+            $totalBatches,
+            count($batch)
+        ));
+
+        $exitCode = $this->runBatch($batch);
+
+        if ($exitCode !== 0) {
+            throw new \Phing\Exception\BuildException(
+                sprintf('Batch %d failed with exit code %d', $this->batchIndex, $exitCode)
             );
         }
     }
