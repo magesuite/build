@@ -68,6 +68,7 @@
               overwrite="true">
             <fileset dir="${build_dir}/shared/dev/tests/integration/framework/Magento/TestFramework/Event">
                 <include name="MailTransportMock.php"/>
+                <include name="MailTransportMockBeforeFixtures.php"/>
                 <include name="MailTransportMockSubscriber.php"/>
             </fileset>
         </copy>
