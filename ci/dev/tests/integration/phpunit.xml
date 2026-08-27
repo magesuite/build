@@ -47,6 +47,7 @@
     </php>
     <extensions>
         <bootstrap class="Magento\TestFramework\Event\Subscribers"/>
+        <bootstrap class="Magento\TestFramework\Event\MailTransportMock"/>
         <bootstrap class="Magento\TestFramework\Event\MemoryUsageMonitor">
             <parameter name="enabled" value="@memory.profiler.enabled@"/>
         </bootstrap>

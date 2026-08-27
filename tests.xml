@@ -64,6 +64,13 @@
                 <include name="MemoryUsageSummarySubscriber.php"/>
             </fileset>
         </copy>
+        <copy todir="${project_dir}/dev/tests/integration/framework/Magento/TestFramework/Event"
+              overwrite="true">
+            <fileset dir="${build_dir}/shared/dev/tests/integration/framework/Magento/TestFramework/Event">
+                <include name="MailTransportMock.php"/>
+                <include name="MailTransportMockSubscriber.php"/>
+            </fileset>
+        </copy>
     </target>
 
     <target name="tests:integration" depends="tests:integration:prepare, tests:integration:check">
