@@ -14,8 +14,11 @@ class MailTransportMockSubscriber implements \PHPUnit\Event\Test\PreparationStar
             return;
         }
 
+        $transportBuilder = $objectManager->get(\Magento\TestFramework\Mail\Template\TransportBuilderMock::class);
+        $transportBuilder->clean();
+
         $objectManager->addSharedInstance(
-            $objectManager->get(\Magento\TestFramework\Mail\Template\TransportBuilderMock::class),
+            $transportBuilder,
             \Magento\Framework\Mail\Template\TransportBuilder::class,
             true
         );

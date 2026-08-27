@@ -47,6 +47,8 @@
         <const name="TESTS_ERROR_LOG_LISTENER_LEVEL" value="-1"/>
     </php>
     <extensions>
+        <!-- Listed twice on purpose: before data fixtures and again after the area load. -->
+        <bootstrap class="Magento\TestFramework\Event\MailTransportMock"/>
         <bootstrap class="Magento\TestFramework\Event\Subscribers"/>
         <bootstrap class="Magento\TestFramework\Event\MailTransportMock"/>
         <bootstrap class="Magento\TestFramework\Event\MemoryUsageMonitor">
