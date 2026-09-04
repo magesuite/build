@@ -47,7 +47,10 @@
         <const name="TESTS_ERROR_LOG_LISTENER_LEVEL" value="-1"/>
     </php>
     <extensions>
+        <!-- Order matters: Subscribers applies data fixtures and loads the area between these two. -->
+        <bootstrap class="Magento\TestFramework\Event\MailTransportMockBeforeFixtures"/>
         <bootstrap class="Magento\TestFramework\Event\Subscribers"/>
+        <bootstrap class="Magento\TestFramework\Event\MailTransportMock"/>
         <bootstrap class="Magento\TestFramework\Event\MemoryUsageMonitor">
             <parameter name="enabled" value="@memory.profiler.enabled@"/>
         </bootstrap>
